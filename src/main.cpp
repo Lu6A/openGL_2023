@@ -1,213 +1,136 @@
-#include <cstddef>
 #include <vector>
 #include "glimac/common.hpp"
+#include "glimac/default_shader.hpp"
 #include "glimac/sphere_vertices.hpp"
-#include "glm/ext/quaternion_trigonometric.hpp"
-#include "glm/ext/scalar_constants.hpp"
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
-#include "glm/gtc/random.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "glm/trigonometric.hpp"
 #include "p6/p6.h"
 
 int main()
 {
-    // creation du contexte p6
     auto ctx = p6::Context{{1280, 720, "TP6 EX1"}};
     ctx.maximize_window();
 
-    // // chargement des shaders
-    // const p6::Shader shader = p6::load_shader(
-    //     "shaders/3D.vs.glsl",
-    //     "shaders/multitext3D.fs.glsl"
-    // );
-    // shader.use();
+    // load textures
+    // img::Image texture = p6::load_image_buffer("assets/textures/triforce.png");
 
-    // // récupération des locations de variables uniformes
-    // GLuint U_MVP_MATRIX_LOCATION    = glGetUniformLocation(shader.id(), "uMVPMatrix");
-    // GLuint U_MV_MATRIX_LOCATION     = glGetUniformLocation(shader.id(), "uMVMatrix");
-    // GLuint U_NORMAL_MATRIX_LOCATION = glGetUniformLocation(shader.id(), "uNormalMatrix");
-    // GLint  U_TEXTURE_1              = glGetUniformLocation(shader.id(), "uTexture1");
-    // GLint  U_TEXTURE_2              = glGetUniformLocation(shader.id(), "uTexture2");
+    // load shaders
+    const p6::Shader shader = p6::load_shader(
+        "shaders/3D.vs.glsl",
+        "shaders/normals.fs.glsl"
+    );
 
-    // glEnable(GL_DEPTH_TEST);
+    // GLuint UTEXTURE = glGetUniformLocation(shader.id(), "uTexture");
+    GLuint U_MVP_MATRIX    = glGetUniformLocation(shader.id(), "uMVPMatrix");
+    GLuint U_MV_MATRIX     = glGetUniformLocation(shader.id(), "uMVMatrix");
+    GLuint U_NORMAL_MATRIX = glGetUniformLocation(shader.id(), "uNormalMatrix");
 
-    // // matrices ?
-    // glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.0f), 800.0f / 600.0f, 0.1f, 100.0f); // param perspective(float fovy, float aspect, float znear, float far)
-    // glm::mat4 MVMatrix     = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
-    // glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
+    // activer le test de profondeur du GPU
+    glEnable(GL_DEPTH_TEST);
 
-    // // creation du vbo
-    // GLuint vbo;
-    // glGenBuffers(1, &vbo);
+    // // texture
+    // GLuint textures;
+    // glGenTextures(1, &textures);
 
-    // // chargement des images
-    // img::Image texture_earth = p6::load_image_buffer(
-    //     "assets/textures/EarthMap.jpg"
-    // );
+    // // binder la texture
+    // glBindTexture(GL_TEXTURE_2D, textures);
 
-    // img::Image texture_clouds = p6::load_image_buffer(
-    //     "assets/textures/CloudMap.jpg"
-    // );
+    // // envoi de l'image à la carte graphique
+    // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.width(), texture.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.data());
 
-    // img::Image texture_moon = p6::load_image_buffer(
-    //     "assets/textures/MoonMap.jpg"
-    // );
-
-    // GLuint textureEarth, textureClouds, textureMoon;
-
-    // // binding du vbo et link des textures
-    // glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    // glGenTextures(1, &textureEarth);
-    // glBindTexture(GL_TEXTURE_2D, textureEarth); // Binding de la texture
-    // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_earth.width(), texture_earth.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_earth.data());
+    // // filtre linéaire
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // // debinder la texture
     // glBindTexture(GL_TEXTURE_2D, 0);
 
-    // glGenTextures(1, &textureMoon);
-    // glBindTexture(GL_TEXTURE_2D, textureMoon); // Binding de la texture
-    // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_moon.width(), texture_moon.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_moon.data());
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // glBindTexture(GL_TEXTURE_2D, 0);
+    // // création des 3 sommets
+    // Vertex2DUV P1 = Vertex2DUV(glm::vec2(-1.f, -1.f), glm::vec2(0, 0));
+    // Vertex2DUV P2 = Vertex2DUV(glm::vec2(1.f, -1.f), glm::vec2(1, 0));
+    // Vertex2DUV P3 = Vertex2DUV(glm::vec2(0, 1.f), glm::vec2(0.5, 1));
 
-    // glGenTextures(1, &textureClouds);
-    // glBindTexture(GL_TEXTURE_2D, textureClouds); // Binding de la texture
-    // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_clouds.width(), texture_clouds.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_clouds.data());
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // glBindTexture(GL_TEXTURE_2D, 0);
+    // TABLEAU DE VERTICES
+    const std::vector<glimac::ShapeVertex>
+        vertices = glimac::sphere_vertices(1.f, 32, 16);
 
-    // // remplissage VBO
-    // const std::vector<glimac::ShapeVertex> vertices = glimac::sphere_vertices(1.f, 32, 16);
-    // glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glimac::ShapeVertex), vertices.data(), GL_STATIC_DRAW);
+    // CREATION DU VBO
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
 
-    // // debinder le VBO
-    // glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // binding du vbo
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    // // création du VAO
-    // GLuint vao;
-    // glGenVertexArrays(1, &vao);
+    // remplissage VBO
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glimac::ShapeVertex), vertices.data(), GL_STATIC_DRAW);
 
-    // // binder le VAO
-    // glBindVertexArray(vao);
+    // debinder le VBO
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // // activation des attributs de vertex
-    // static constexpr GLuint VERTEX_ATTR_POSITION = 0;
-    // static constexpr GLuint VERTEX_NORMAL        = 1;
-    // static constexpr GLuint TEXT_COORD           = 2;
+    // création du vao
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
 
-    // glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
-    // glEnableVertexAttribArray(VERTEX_NORMAL);
-    // glEnableVertexAttribArray(TEXT_COORD);
+    // binder le VAO
+    glBindVertexArray(vao);
 
-    // // spécification des attributs de vertex
-    // glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    // glVertexAttribPointer(VERTEX_ATTR_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, position));
-    // glVertexAttribPointer(VERTEX_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, normal));
-    // glVertexAttribPointer(TEXT_COORD, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, texCoords));
-    // glBindBuffer(GL_ARRAY_BUFFER, 0);
-    // glBindVertexArray(0);
+    // activation des attributs de vertex
+    static constexpr GLuint VERTEX_ATTR_POSITION  = 0;
+    static constexpr GLuint VERTEX_ATTR_NORMAL    = 1;
+    static constexpr GLuint VERTEX_ATTR_TEXCOORDS = 2;
 
-    // uint nbLunes = 32;
+    glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
+    glEnableVertexAttribArray(VERTEX_ATTR_NORMAL);
+    glEnableVertexAttribArray(VERTEX_ATTR_TEXCOORDS);
 
-    // // initialisation de la camera
-    // TrackballCamera trackballCamera;
+    // glEnableVertexAttribArray(VERTEX_ATTR_TEXTURE);
 
-    // std::vector<glm::vec3> rotateAxes;
-    // std::vector<glm::vec3> translations;
+    //  spécification des attributs de vertex
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    // for (int i = 0; i < nbLunes; i++)
-    // {
-    //     rotateAxes.push_back(glm::sphericalRand(1.0f));
-    //     translations.push_back(glm::sphericalRand(2.0f));
-    // }
+    glVertexAttribPointer(VERTEX_ATTR_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, position)); // specification des attributs de vertex
 
-    // ///////////////////////////////////////////////
-    // ///////////////BOUCLE D'AFFICHAGE//////////////
-    // ///////////////////////////////////////////////
+    glVertexAttribPointer(VERTEX_ATTR_NORMAL, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, normal));
 
-    // ctx.update = [&]() {
-    //     ////gestion camera////
-    //     glm::mat4 ViewMatrix = trackballCamera.getViewMatrix();
+    glVertexAttribPointer(VERTEX_ATTR_TEXCOORDS, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, texCoords));
 
-    //     // recupération des evenements//
-    //     ctx.mouse_dragged = [&trackballCamera](const p6::MouseDrag& button) {
-    //         trackballCamera.rotateLeft(button.delta.x * 50);
-    //         trackballCamera.rotateUp(button.delta.y * 50);
-    //     };
+    // glVertexAttribPointer(VERTEX_ATTR_TEXTURE, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2DUV), (const GLvoid*)offsetof(Vertex2DUV, texture)); // specification des attributs de vertex
 
-    //     // shader.use();
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 
-    //     // nettoyage de la fenêtre
-    //     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    ctx.update = [&]() {
+        shader.use();
+        glClearColor(0.f, 0.f, 0.f, 1.f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //     glUniform1i(U_TEXTURE_1, 0);
-    //     glUniform1i(U_TEXTURE_2, 1);
-    //     glBindVertexArray(vao);
+        glBindVertexArray(vao);
 
-    //     // d'autres matrices ?
+        glm::mat4 VMatrix = glm::mat4(1);
 
-    //     ////// TERRE //////
+        glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
+        glm::mat4 MMatrix      = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
+        glm::mat4 MVMatrix     = VMatrix * MMatrix;
+        glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
 
-    //     // on la dessine
-    //     glm::mat4 Mrotate      = glm::rotate(MVMatrix, ctx.time(), glm::vec3(0.0f, 1.0f, 0.0f));
-    //     glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), 800.f / 600.f, 0.1f, 100.f);
-    //     glm::mat4 MVMatrix     = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
-    //     glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
+        glUniformMatrix4fv(U_MVP_MATRIX, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+        glUniformMatrix4fv(U_MV_MATRIX, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+        glUniformMatrix4fv(U_NORMAL_MATRIX, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
 
-    //     glUniformMatrix4fv(U_MVP_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(ProjMatrix * ViewMatrix));
-    //     glUniformMatrix4fv(U_MV_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(ViewMatrix * Mrotate));
-    //     glUniformMatrix4fv(U_NORMAL_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+        // glBindTexture(GL_TEXTURE_2D, textures);
+        // glUniform1i(UTEXTURE, 0);
 
-    //     // on charge les textures
-    //     glActiveTexture(GL_TEXTURE0);
-    //     glBindTexture(GL_TEXTURE_2D, textureEarth); // la texture earthTexture est bindée sur l'unité GL_TEXTURE0
-    //     glActiveTexture(GL_TEXTURE1);
-    //     glBindTexture(GL_TEXTURE_2D, textureClouds); // la texture cloudTexture est bindée sur l'unité GL_TEXTURE1
+        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
-    //     glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+        // glBindTexture(GL_TEXTURE_2D, 0);
+        glBindVertexArray(0);
+    };
 
-    //     // on décharge la texture de la terre localisée dans l'unité 0
-    //     glActiveTexture(GL_TEXTURE0);
+    // Should be done last. It starts the infinite loop.
+    ctx.start();
 
-    //     ////// LUNES //////
-
-    //     // on charge la texture de la Lune dans la "case 0"
-    //     glBindTexture(GL_TEXTURE_2D, textureMoon);
-
-    //     // on les dessine
-
-    //     for (size_t i = 0; i < rotateAxes.size(); i++)
-    //     {
-    //         glm::mat4 MVMatrix2     = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
-    //         glm::mat4 NormalMatrix2 = glm::transpose(glm::inverse(MVMatrix2));
-    //         MVMatrix2               = glm::rotate(MVMatrix2, ctx.time(), rotateAxes.at(i)); // Translation * Rotation
-    //         MVMatrix2               = glm::translate(MVMatrix2, translations.at(i));        // Translation * Rotation * Translation
-    //         MVMatrix2               = glm::scale(MVMatrix2, glm::vec3(0.2, 0.2, 0.2));      // Translation * Rotation * Translation * Scale
-    //         glUniformMatrix4fv(U_MVP_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix2));
-    //         glUniformMatrix4fv(U_MV_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(MVMatrix2));
-    //         glUniformMatrix4fv(U_NORMAL_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(NormalMatrix2));
-    //         glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-    //     }
-
-    //     // debinder le vbo et toutes les textures
-    //     glBindVertexArray(0);
-    //     glActiveTexture(GL_TEXTURE0);
-    //     glBindTexture(GL_TEXTURE_2D, 0);
-    //     glActiveTexture(GL_TEXTURE1);
-    //     glBindTexture(GL_TEXTURE_2D, 0);
-    // };
-
-    // // Should be done last. It starts the infinite loop.
-    // ctx.start();
-
-    // glDeleteTextures(1, &textureClouds);
-    // glDeleteTextures(1, &textureEarth);
-    // glDeleteTextures(1, &textureMoon);
-    // glDeleteBuffers(1, &vbo);
-    // glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+    glDeleteVertexArrays(1, &vao);
+    // glDeleteTextures(0, &textures);
 }
