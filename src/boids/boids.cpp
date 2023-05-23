@@ -28,12 +28,12 @@ Boid::Boid(const p6::Context& ctx) // aléatoire
 {
 }
 
-void Boid::render(p6::Context& ctx)
+glm::vec3 Boid::render(p6::Context& ctx)
 {
     // p6::Angle theta = getAngle() + p6::Angle(90_degrees);
-    ctx.fill          = {1, 0.2, 0.2};
-    ctx.stroke_weight = 0.;
-    ctx.equilateral_triangle(p6::Center{m_position}, p6::Radius{0.05f}, getAngle());
+    // ctx.fill          = {1, 0.2, 0.2};
+    // ctx.stroke_weight = 0.;
+    // ctx.equilateral_triangle(p6::Center{m_position}, p6::Radius{0.05f}, getAngle());
 
     //  donne les nouveaux coordonnées en fonction des vélocités
     m_position += m_velocity;
@@ -49,6 +49,8 @@ void Boid::render(p6::Context& ctx)
     {
         m_velocity.y *= -1;
     }
+
+    return m_position;
 }
 
 float Boid::distanceBetween(Boid boid)

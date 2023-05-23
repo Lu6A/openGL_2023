@@ -2,6 +2,7 @@
 #include <vector>
 #include "boids/boids.hpp"
 #include "boids/field.hpp"
+#include "boids/strengths.hpp"
 #include "glimac/common.hpp"
 #include "glimac/sphere_vertices.hpp"
 #include "glm/ext/quaternion_trigonometric.hpp"
@@ -13,14 +14,19 @@
 #include "glm/trigonometric.hpp"
 #include "p6/p6.h"
 
+strengths strengths = {1, 1, 1, 0.06f, glm::length(glm::vec3(0.007f, 0.007f, 0.007f))};
+
 int main()
 {
     p6::Context ctx({800, 600, "Boids"});
+    ctx.maximize_window();
 
     const p6::Shader shader = p6::load_shader(
         "shaders/3D.vs.glsl",
         "shaders/tex3D.fs.glsl"
     );
+
+    shader.use();
 
     GLuint U_MVP_MATRIX_LOCATION    = glGetUniformLocation(shader.id(), "uMVPMatrix");
     GLuint U_MV_MATRIX_LOCATION     = glGetUniformLocation(shader.id(), "uMVMatrix");
@@ -67,33 +73,36 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    Field field(100, ctx);
-    auto& boid = field.getBoids()[0];
+    Field field(3, ctx);
 
     ctx.update = [&]() {
         shader.use();
+        std::vector<glm::vec3> positions = field.fieldDraw(ctx);
+        field.applyRules(strengths);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
 
-        // for (auto& boid : field.getBoids())
-        // {
-        boid.render(ctx);
-        glm::mat4 ProjMatrix    = glm::perspective(glm::radians(70.f), 800.f / 600.f, 0.1f, 100.f);
-        glm::mat4 MVMatrix      = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
-        glm::mat4 NormalMatrix  = glm::transpose(glm::inverse(MVMatrix));
-        glm::mat4 MVMatrixBoids = glm::translate(glm::mat4{1.f}, {0.f, 0.f, -3.f});    // Translation
-        MVMatrixBoids           = glm::translate(MVMatrixBoids, boid.getVelocity());   // Translation * Rotation * Translation
-        MVMatrixBoids           = glm::scale(MVMatrixBoids, glm::vec3{0.2, 0.2, 0.2}); // Translation * Rotation * Translation * Scale
-        MVMatrixBoids           = MVMatrix * MVMatrixBoids;
-        glUniformMatrix4fv(U_MVP_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
-        glUniformMatrix4fv(U_MV_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(MVMatrixBoids));
-        glUniformMatrix4fv(U_NORMAL_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
-        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-        // }
+        glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), 800.f / 600.f, 0.1f, 100.f);
+        glm::mat4 MVMatrix     = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
+        glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
+
+        for (size_t i = 0; i < 3; i++)
+        {
+            glm::mat4 MVMatrixBoids = glm::translate(glm::mat4{1.f}, {0.f, 0.f, -3.f});    // Translation
+            MVMatrixBoids           = glm::translate(MVMatrixBoids, positions[i]);         // Translation * Rotation * Translation
+            MVMatrixBoids           = glm::scale(MVMatrixBoids, glm::vec3{0.2, 0.2, 0.2}); // Translation * Rotation * Translation * Scale
+            MVMatrixBoids           = MVMatrix * MVMatrixBoids;
+            glUniformMatrix4fv(U_MVP_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+            glUniformMatrix4fv(U_MV_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(MVMatrixBoids));
+            glUniformMatrix4fv(U_NORMAL_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+            glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+        };
 
         // debinder le vbo
         glBindVertexArray(0);
     };
+
     ctx.start();
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);

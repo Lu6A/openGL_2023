@@ -10,11 +10,12 @@ Field::Field(size_t n, const p6::Context& ctx)
     }
 }
 
-void Field::fieldDraw(p6::Context& ctx)
+std::vector<glm::vec3> Field::fieldDraw(p6::Context& ctx)
 {
+    std::vector<glm::vec3> positions;
     for (size_t i = 0; i < N; i++)
     {
-        boids[i].render(ctx);
+        positions.push_back(boids[i].render(ctx));
     }
 }
 

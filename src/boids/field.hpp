@@ -12,7 +12,7 @@ public:
     Field(size_t N, const p6::Context& ctx); // constructeur paramétrique
     ~Field() = default;
 
-    void               fieldDraw(p6::Context& ctx);
-    void               applyRules(strengths strengths);
-    std::vector<Boid>& getBoids() { return boids; }
+    std::vector<glm::vec3> fieldDraw(p6::Context& ctx);
+    void                   applyRules(strengths strengths);
+    std::vector<Boid>&     getBoids() { return boids; }
 };

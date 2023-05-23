@@ -1,5 +1,6 @@
 #version 330 core
 
+//in vec3 vVertexNormalVS;
 //in vec2 vTextCoord;
 out vec4 fFragColor;
 

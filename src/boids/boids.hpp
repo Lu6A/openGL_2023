@@ -20,8 +20,8 @@ public:
     glm::vec3 getPosition();
     glm::vec3 getVelocity();
 
-    void render(p6::Context& ctx);
-    void applyRules(std::vector<Boid> boids, strengths strengths);
+    glm::vec3 render(p6::Context& ctx);
+    void      applyRules(std::vector<Boid> boids, strengths strengths);
 
     void maxSpeed(strengths strengths);
 };
