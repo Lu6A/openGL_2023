@@ -3,7 +3,7 @@
 // Variables d'entrées
 in vec3 vVertexPosition;
 in vec3 vVertexNormal;
-in vec2 vVertexTexCoords;
+//in vec2 vVertexTexCoords;
 
 // Variables de sorties 
 out vec3 fFragColor;

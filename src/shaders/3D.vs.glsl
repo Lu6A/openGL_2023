@@ -2,12 +2,12 @@
 
 layout(location = 0) in vec3 aVertexPosition;
 layout(location = 1) in vec3 aVertexNormal;
-layout(location = 2) in vec2 aVertexTexCoords;
+//layout(location = 2) in vec2 aVertexTexCoords;
 
 // Variables de sorties
 out vec3 vVertexPosition;
 out vec3 vVertexNormal;
-out vec2 vVertexTexCoords;
+//out vec2 vVertexTexCoords;
 
 //Matrices de transformations
 uniform mat4 uMVPMatrix;
@@ -24,7 +24,7 @@ void main()
   //Calcul des variables de sorties
   vVertexPosition = vec3(uMVMatrix * vertexPosition);
   vVertexNormal = vec3(uNormalMatrix * vertexNormal);
-  vVertexTexCoords = aVertexTexCoords;
+  //vVertexTexCoords = aVertexTexCoords;
   
   gl_Position = uMVPMatrix * vertexPosition;
 
