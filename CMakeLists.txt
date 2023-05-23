@@ -14,6 +14,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(p6)
 
+# ---Add tinyobjloader library---
+add_subdirectory(tinyobjloader-release)
+
 # ---Create a target for each exercise---
 function(add_exercise EXERCISE_NAME)
     set(TARGET_NAME ${EXERCISE_NAME}_exe)
@@ -37,6 +40,9 @@ function(add_exercise EXERCISE_NAME)
 
     # ---Link p6 library---
     target_link_libraries(${TARGET_NAME} PRIVATE p6::p6)
+
+   # ---Link tinyobjloader library---
+   target_link_libraries(${TARGET_NAME} PRIVATE tinyobjloader)
 
     # ---Set the output folder---
     set_target_properties(${TARGET_NAME} PROPERTIES
