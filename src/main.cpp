@@ -23,7 +23,7 @@ int main()
 
     const p6::Shader shader = p6::load_shader(
         "shaders/3D.vs.glsl",
-        "shaders/tex3D.fs.glsl"
+        "shaders/normals.fs.glsl"
     );
 
     shader.use();
@@ -80,6 +80,8 @@ int main()
         std::vector<glm::vec3> positions = field.fieldDraw(ctx);
         field.applyRules(strengths);
 
+        std::cout << positions[0].x << " " << positions[0].y << " " << positions[0].z << std::endl;
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
 
@@ -89,12 +91,16 @@ int main()
 
         for (size_t i = 0; i < 3; i++)
         {
-            glm::mat4 MVMatrixBoids = glm::translate(glm::mat4{1.f}, {0.f, 0.f, -3.f});    // Translation
-            MVMatrixBoids           = glm::translate(MVMatrixBoids, positions[i]);         // Translation * Rotation * Translation
-            MVMatrixBoids           = glm::scale(MVMatrixBoids, glm::vec3{0.2, 0.2, 0.2}); // Translation * Rotation * Translation * Scale
-            MVMatrixBoids           = MVMatrix * MVMatrixBoids;
+            MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f}); // Translation
+            MVMatrix = glm::translate(MVMatrix, positions[i]);          // Translation * Rotation * Translation
+            MVMatrix = glm::scale(MVMatrix, glm::vec3{0.1f});
+
+            // glm::mat4 MVMatrixBoids = glm::translate(glm::mat4{1.f}, {1.f, 1.f, -1.f}); // Translation
+            // MVMatrixBoids           = glm::translate(MVMatrixBoids, positions[i]);      // Translation * Rotation * Translation
+            // MVMatrixBoids           = glm::scale(MVMatrixBoids, glm::vec3{1., 1., 1.}); // Translation * Rotation * Translation * Scale
+            // MVMatrixBoids           = MVMatrix * MVMatrixBoids;
             glUniformMatrix4fv(U_MVP_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
-            glUniformMatrix4fv(U_MV_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(MVMatrixBoids));
+            glUniformMatrix4fv(U_MV_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(MVMatrix /*Boids*/));
             glUniformMatrix4fv(U_NORMAL_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
             glDrawArrays(GL_TRIANGLES, 0, vertices.size());
         };
