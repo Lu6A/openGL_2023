@@ -17,6 +17,8 @@ std::vector<glm::vec3> Field::fieldDraw(p6::Context& ctx)
     {
         positions.push_back(boids[i].render(ctx));
     }
+
+    return positions;
 }
 
 void Field::applyRules(strengths strengths)

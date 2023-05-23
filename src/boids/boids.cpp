@@ -1,4 +1,5 @@
 #include "boids.hpp"
+#include <cmath>
 #include "glm/ext/quaternion_trigonometric.hpp"
 #include "glm/ext/scalar_constants.hpp"
 #include "glm/fwd.hpp"
@@ -18,12 +19,13 @@ Boid::Boid(const p6::Context& ctx) // aléatoire
     : m_position(glm::vec3(
         p6::random::number(-ctx.aspect_ratio(), ctx.aspect_ratio()),
         p6::random::number(-1.f, 1.f),
-        p6::random::number(-1.f, 1.f)
+        // p6::random::number(-1.f, 1.f)
+        -2.f
     ))
     , m_velocity(glm::vec3(
-          p6::random::number(-0.005f, 0.005f),
-          p6::random::number(-0.005f, 0.005f),
-          p6::random::number(-0.005f, 0.005f)
+          p6::random::number(-0.5f, 0.5f),
+          p6::random::number(-0.5f, 0.5f),
+          p6::random::number(-0.5f, 0.5f)
       ))
 {
 }
@@ -48,6 +50,11 @@ glm::vec3 Boid::render(p6::Context& ctx)
     if (std::abs(m_position.y) > 1)
     {
         m_velocity.y *= -1;
+    }
+
+    if (m_position.z > -1 || m_position.z < -5)
+    {
+        m_velocity.z *= -1;
     }
 
     return m_position;
