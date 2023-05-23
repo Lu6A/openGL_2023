@@ -19,7 +19,7 @@ void main()
 {
   //Passage en coordonnées homogènes
   vec4 vertexPosition = vec4(aVertexPosition, 1);
-  vec4 vertexNormal = vec4(aVertexNormal, 0);
+  vec4 vertexNormal = vec4(aVertexNormal, 1);
   
   //Calcul des variables de sorties
   vVertexPosition = vec3(uMVMatrix * vertexPosition);
