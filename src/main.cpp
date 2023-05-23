@@ -27,9 +27,12 @@ int main()
     // activer le test de profondeur du GPU
     glEnable(GL_DEPTH_TEST);
 
-    // TABLEAU DE VERTICES
-    const std::vector<glimac::ShapeVertex>
-        vertices = glimac::sphere_vertices(1.f, 32, 16);
+    Model mouche = Model();
+
+    mouche.loadModel("fly.obj");
+    // Get the vertices and number of vertices
+    std::vector<glimac::ShapeVertex> m_vertices    = mouche.getVertices();
+    GLsizei                          m_vertexCount = mouche.getNumVertices();
 
     // CREATION DU VBO
     GLuint vbo;
@@ -39,7 +42,7 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     // remplissage VBO
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glimac::ShapeVertex), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(glimac::ShapeVertex), m_vertices.data(), GL_STATIC_DRAW);
 
     // debinder le VBO
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -52,13 +55,13 @@ int main()
     glBindVertexArray(vao);
 
     // activation des attributs de vertex
-    static constexpr GLuint VERTEX_ATTR_POSITION  = 0;
-    static constexpr GLuint VERTEX_ATTR_NORMAL    = 1;
-    static constexpr GLuint VERTEX_ATTR_TEXCOORDS = 2;
+    static constexpr GLuint VERTEX_ATTR_POSITION = 0;
+    static constexpr GLuint VERTEX_ATTR_NORMAL   = 1;
+    // static constexpr GLuint VERTEX_ATTR_TEXCOORDS = 2;
 
     glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
     glEnableVertexAttribArray(VERTEX_ATTR_NORMAL);
-    glEnableVertexAttribArray(VERTEX_ATTR_TEXCOORDS);
+    // glEnableVertexAttribArray(VERTEX_ATTR_TEXCOORDS);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
@@ -66,14 +69,10 @@ int main()
 
     glVertexAttribPointer(VERTEX_ATTR_NORMAL, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, normal));
 
-    glVertexAttribPointer(VERTEX_ATTR_TEXCOORDS, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, texCoords));
+    // glVertexAttribPointer(VERTEX_ATTR_TEXCOORDS, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, texCoords));
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
-    Model mouche = Model();
-
-    mouche.loadModel("fly.obj");
 
     ctx.update = [&]() {
         shader.use();
@@ -82,23 +81,10 @@ int main()
 
         glBindVertexArray(vao);
 
-        glm::mat4 VMatrix = glm::mat4(1);
+        // Render the model
 
-        glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
-        glm::mat4 MMatrix      = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
-        glm::mat4 MVMatrix     = VMatrix * MMatrix;
-        glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
+        glDrawArrays(GL_TRIANGLES, 0, m_vertexCount);
 
-        glUniformMatrix4fv(U_MVP_MATRIX, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
-        glUniformMatrix4fv(U_MV_MATRIX, 1, GL_FALSE, glm::value_ptr(MVMatrix));
-        glUniformMatrix4fv(U_NORMAL_MATRIX, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
-
-        // glBindTexture(GL_TEXTURE_2D, textures);
-        // glUniform1i(UTEXTURE, 0);
-
-        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-
-        // glBindTexture(GL_TEXTURE_2D, 0);
         glBindVertexArray(0);
     };
 
