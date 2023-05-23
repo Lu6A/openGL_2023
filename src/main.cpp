@@ -20,10 +20,6 @@ int main()
         "shaders/normals.fs.glsl"
     );
 
-    GLuint U_MVP_MATRIX    = glGetUniformLocation(shader.id(), "uMVPMatrix");
-    GLuint U_MV_MATRIX     = glGetUniformLocation(shader.id(), "uMVMatrix");
-    GLuint U_NORMAL_MATRIX = glGetUniformLocation(shader.id(), "uNormalMatrix");
-
     // activer le test de profondeur du GPU
     glEnable(GL_DEPTH_TEST);
 

@@ -1,20 +1,14 @@
 #version 330 core
 
-// Variables d'entrées
-in vec3 vVertexPosition;
-in vec3 vVertexNormal;
-//in vec2 vVertexTexCoords;
-
-// Variables de sorties 
-out vec3 fFragColor;
+//in vec3 vVertexNormalVS;
+//in vec2 vTextCoord;
+out vec4 fFragColor;
 
 //uniform sampler2D uTexture;
 
 void main()
 {
-    fFragColor = normalize(vVertexNormal);
-    //fFragColor = vec3(1,0,0); // pour tester si on a des vertex
+    vec3 color = vec3(0.66f, 0.09f, 0.09f);
+    fFragColor = vec4(color.xyz, 1.f);
 }
-
-
 
