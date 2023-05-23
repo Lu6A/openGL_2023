@@ -1,11 +1,4 @@
 #include "field.hpp"
-#include <math.h>
-#include <cmath>
-#include <cstddef>
-#include <iostream>
-#include "boid.hpp"
-#include "boids.hpp"
-#include "glm/glm.hpp"
 
 // constructeur paramétrique
 Field::Field(size_t n, const p6::Context& ctx)
@@ -13,11 +6,11 @@ Field::Field(size_t n, const p6::Context& ctx)
 {
     for (size_t i = 0; i < n; i++)
     {
-        boids.push_back(Boid3D(ctx)); // aléatoire
+        boids.push_back(Boid(ctx)); // aléatoire
     }
 }
 
-void Field::fieldDraw(p6::Context& ctx) const
+void Field::fieldDraw(p6::Context& ctx)
 {
     for (size_t i = 0; i < N; i++)
     {
@@ -25,10 +18,10 @@ void Field::fieldDraw(p6::Context& ctx) const
     }
 }
 
-void Field::applyRules(float dist, strengths strengths)
+void Field::applyRules(strengths strengths)
 {
     for (auto& boid : boids) // équivaut à 'for (size_t i = 0; i < boids.size(); i++)'
     {
-        boid.applyRules(this->boids, dist, strengths);
+        boid.applyRules(this->boids, strengths);
     }
 }
