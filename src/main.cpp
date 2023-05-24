@@ -20,12 +20,20 @@ int main()
         "shaders/normals.fs.glsl"
     );
 
+    shader.use();
+
+    // Variables uniformes
+    GLint uMVPMatrix_location    = glGetUniformLocation(shader.id(), "uMVPMatrix");
+    GLint uMVMatrix_location     = glGetUniformLocation(shader.id(), "UMVMatrix");
+    GLint uNormalMatrix_location = glGetUniformLocation(shader.id(), "uNormalMatrix");
+    GLint uTexture_location      = glad_glGetUniformLocation(shader.id(), "uTexture");
+
     // activer le test de profondeur du GPU
     glEnable(GL_DEPTH_TEST);
 
     Model mouche = Model();
 
-    mouche.loadModel("fly.obj");
+    mouche.loadModel("fly2.obj");
     // Get the vertices and number of vertices
     std::vector<glimac::ShapeVertex> m_vertices    = mouche.getVertices();
     GLsizei                          m_vertexCount = mouche.getNumVertices();
@@ -77,9 +85,17 @@ int main()
 
         glBindVertexArray(vao);
 
+        glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
+        glm::mat4 MVMatrix     = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
+        glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
+
+        glUniformMatrix4fv(uMVPMatrix_location, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+        glUniformMatrix4fv(uMVMatrix_location, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+        glUniformMatrix4fv(uNormalMatrix_location, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+
         // Render the model
 
-        glDrawArrays(GL_TRIANGLES, 0, m_vertexCount);
+        glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
 
         glBindVertexArray(0);
     };
