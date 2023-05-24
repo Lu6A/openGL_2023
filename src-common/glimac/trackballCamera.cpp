@@ -5,14 +5,6 @@
 TrackballCamera::TrackballCamera(float Distance, float AngleX, float AngleY)
     : m_distance(Distance), m_AngleX(AngleX), m_AngleY(AngleY) {}
 
-<<<<<<< HEAD
-=======
-void TrackballCamera::moveFront(float delta)
-{
-    m_distance -= delta;
-}
-
->>>>>>> lu6
 void TrackballCamera::rotateLeft(float degrees)
 {
     m_AngleY += degrees;
