@@ -31,8 +31,6 @@ int main()
         camera.zoom(-scroll.dy);
     };
 
-    glm::mat4 viewMatrix = camera.getViewMatrix();
-
     /////////////// GESTION DES BOIDS ///////////////
 
     const p6::Shader shader = p6::load_shader(
@@ -54,9 +52,6 @@ int main()
 
     // binding du vbo
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    // debindage de la texture
-    glBindTexture(GL_TEXTURE_2D, 0);
 
     // remplissage VBO
     const std::vector<glimac::ShapeVertex> vertices = glimac::sphere_vertices(1.f, 32, 16);
