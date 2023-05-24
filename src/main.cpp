@@ -15,29 +15,39 @@
 #include "model.hpp"
 #include "p6/p6.h"
 
-strengths strengths = {1, 1, 1, 0.06f, glm::length(glm::vec3(0.007f, 0.007f, 0.007f))};
+strengths strengths = {1, 1, 1, 0.06f, glm::length(glm::vec3(0.003f, 0.003f, 0.003f))};
 
 int main()
 {
     // creation du contexte p6
-    auto ctx = p6::Context{{1280, 720, "TP6 EX1"}};
+    auto ctx = p6::Context{{800, 600, "Boids"}};
     ctx.maximize_window();
 
-    // // chargement des shaders
-    // const p6::Shader shader = p6::load_shader(
-    //     "shaders/3D.vs.glsl",
-    //     "shaders/multitext3D.fs.glsl"
-    // );
-    // shader.use();
+    ///////////// GESTION DE LA CAMERA ///////////////
+
+    TrackballCamera camera;
+
+    ctx.mouse_scrolled = [&](p6::MouseScroll scroll) {
+        camera.zoom(-scroll.dy);
+    };
+
+    /////////////// GESTION DES BOIDS ///////////////
+
+    // chargement des shaders
+    const p6::Shader shader = p6::load_shader(
+        "shaders/3D.vs.glsl",
+        "shaders/normals.fs.glsl"
+    );
+    shader.use();
 
     // // récupération des locations de variables uniformes
-    // GLuint U_MVP_MATRIX_LOCATION    = glGetUniformLocation(shader.id(), "uMVPMatrix");
-    // GLuint U_MV_MATRIX_LOCATION     = glGetUniformLocation(shader.id(), "uMVMatrix");
-    // GLuint U_NORMAL_MATRIX_LOCATION = glGetUniformLocation(shader.id(), "uNormalMatrix");
+    GLuint U_MVP_MATRIX_LOCATION    = glGetUniformLocation(shader.id(), "uMVPMatrix");
+    GLuint U_MV_MATRIX_LOCATION     = glGetUniformLocation(shader.id(), "uMVMatrix");
+    GLuint U_NORMAL_MATRIX_LOCATION = glGetUniformLocation(shader.id(), "uNormalMatrix");
     // GLint  U_TEXTURE_1              = glGetUniformLocation(shader.id(), "uTexture1");
     // GLint  U_TEXTURE_2              = glGetUniformLocation(shader.id(), "uTexture2");
 
-    // glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
     // // matrices ?
     // glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.0f), 800.0f / 600.0f, 0.1f, 100.0f); // param perspective(float fovy, float aspect, float znear, float far)
@@ -46,7 +56,7 @@ int main()
 
     Model mouche = Model();
 
-    mouche.loadModel("fly2.obj");
+    mouche.loadModel("fly.obj");
     // Get the vertices and number of vertices
     std::vector<glimac::ShapeVertex> m_vertices    = mouche.getVertices();
     GLsizei                          m_vertexCount = mouche.getNumVertices();
