@@ -73,7 +73,7 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    Field field(3, ctx);
+    Field field(50, ctx);
 
     ctx.update = [&]() {
         shader.use();
@@ -89,11 +89,11 @@ int main()
         glm::mat4 MVMatrix     = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
         glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
 
-        for (size_t i = 0; i < 3; i++)
+        for (size_t i = 0; i < field.getBoids().size(); i++)
         {
             MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f}); // Translation
             MVMatrix = glm::translate(MVMatrix, positions[i]);          // Translation * Rotation * Translation
-            MVMatrix = glm::scale(MVMatrix, glm::vec3{0.1f});
+            MVMatrix = glm::scale(MVMatrix, glm::vec3{0.02f});
 
             // glm::mat4 MVMatrixBoids = glm::translate(glm::mat4{1.f}, {1.f, 1.f, -1.f}); // Translation
             // MVMatrixBoids           = glm::translate(MVMatrixBoids, positions[i]);      // Translation * Rotation * Translation
