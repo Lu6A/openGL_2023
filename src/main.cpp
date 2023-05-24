@@ -4,7 +4,9 @@
 #include "boids/field.hpp"
 #include "boids/strengths.hpp"
 #include "glimac/common.hpp"
+#include "glimac/freeflyCamera.hpp"
 #include "glimac/sphere_vertices.hpp"
+#include "glimac/trackballCamera.hpp"
 #include "glm/ext/quaternion_trigonometric.hpp"
 #include "glm/ext/scalar_constants.hpp"
 #include "glm/fwd.hpp"
@@ -20,6 +22,18 @@ int main()
 {
     p6::Context ctx({800, 600, "Boids"});
     ctx.maximize_window();
+
+    ///////////// GESTION DE LA CAMERA ///////////////
+
+    TrackballCamera camera;
+
+    ctx.mouse_scrolled = [&](p6::MouseScroll scroll) {
+        camera.zoom(-scroll.dy);
+    };
+
+    glm::mat4 viewMatrix = camera.getViewMatrix();
+
+    /////////////// GESTION DES BOIDS ///////////////
 
     const p6::Shader shader = p6::load_shader(
         "shaders/3D.vs.glsl",
@@ -80,7 +94,8 @@ int main()
         std::vector<glm::vec3> positions = field.fieldDraw(ctx);
         field.applyRules(strengths);
 
-        std::cout << positions[0].x << " " << positions[0].y << " " << positions[0].z << std::endl;
+        ///////////// GESTION DE LA CAMERA ///////////////
+        glm::mat4 viewMatrix = camera.getViewMatrix();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
@@ -94,7 +109,7 @@ int main()
             MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f}); // Translation
             MVMatrix = glm::translate(MVMatrix, positions[i]);          // Translation * Rotation * Translation
             MVMatrix = glm::scale(MVMatrix, glm::vec3{0.02f});
-
+            MVMatrix = viewMatrix * MVMatrix;
             // glm::mat4 MVMatrixBoids = glm::translate(glm::mat4{1.f}, {1.f, 1.f, -1.f}); // Translation
             // MVMatrixBoids           = glm::translate(MVMatrixBoids, positions[i]);      // Translation * Rotation * Translation
             // MVMatrixBoids           = glm::scale(MVMatrixBoids, glm::vec3{1., 1., 1.}); // Translation * Rotation * Translation * Scale
