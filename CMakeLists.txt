@@ -7,10 +7,11 @@ project(OpenGL-TPs-Template)
 # ---Add p6 library---
 include(FetchContent)
 set(P6_RAW_OPENGL_MODE ON CACHE BOOL "")
+include(FetchContent)
 FetchContent_Declare(
     p6
     GIT_REPOSITORY https://github.com/julesfouchy/p6
-    GIT_TAG 350bf29ec49f43c8600c7e0dbc6099091367c752
+    GIT_TAG b9e6366e1198abdd7bc835e6125f9ff5b89a75b8
 )
 FetchContent_MakeAvailable(p6)
 
