@@ -23,9 +23,9 @@ Boid::Boid(const p6::Context& ctx) // aléatoire
         -2.f
     ))
     , m_velocity(glm::vec3(
-          p6::random::number(-0.5f, 0.5f),
-          p6::random::number(-0.5f, 0.5f),
-          p6::random::number(-0.5f, 0.5f)
+          p6::random::number(-0.2f, 0.2f),
+          p6::random::number(-0.2f, 0.2f),
+          p6::random::number(-0.2f, 0.2f)
       ))
 {
 }

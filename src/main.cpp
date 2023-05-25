@@ -1,4 +1,4 @@
-#include <cstddef>
+#include <iostream>
 #include <vector>
 #include "boids/boids.hpp"
 #include "boids/field.hpp"
@@ -11,17 +11,18 @@
 #include "glm/ext/scalar_constants.hpp"
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
-#include "glm/gtc/random.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/trigonometric.hpp"
 #include "loadingProgram.hpp"
+#include "model.hpp"
 #include "p6/p6.h"
 
-strengths strengths = {1, 1, 1, 0.06f, glm::length(glm::vec3(0.007f, 0.007f, 0.007f))};
+strengths strengths = {1, 1, 1, 0.06f, glm::length(glm::vec3(0.003f, 0.003f, 0.003f))};
 
 int main()
 {
-    p6::Context ctx({800, 600, "Boids"});
+    // creation du contexte p6
+    auto ctx = p6::Context{{800, 600, "Boids"}};
     ctx.maximize_window();
 
     ///////////// GESTION DE LA CAMERA ///////////////
@@ -40,13 +41,28 @@ int main()
 
     program.use();
 
+    // // récupération des locations de variables uniformes
     GLuint U_MVP_MATRIX_LOCATION    = glGetUniformLocation(shader.id(), "uMVPMatrix");
     GLuint U_MV_MATRIX_LOCATION     = glGetUniformLocation(shader.id(), "uMVMatrix");
     GLuint U_NORMAL_MATRIX_LOCATION = glGetUniformLocation(shader.id(), "uNormalMatrix");
+    // GLint  U_TEXTURE_1              = glGetUniformLocation(shader.id(), "uTexture1");
+    // GLint  U_TEXTURE_2              = glGetUniformLocation(shader.id(), "uTexture2");
 
     glEnable(GL_DEPTH_TEST);
 
-    // creation du vbo
+    // // matrices ?
+    // glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.0f), 800.0f / 600.0f, 0.1f, 100.0f); // param perspective(float fovy, float aspect, float znear, float far)
+    // glm::mat4 MVMatrix     = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
+    // glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
+
+    Model mouche = Model();
+
+    mouche.loadModel("fly.obj");
+    // Get the vertices and number of vertices
+    std::vector<glimac::ShapeVertex> m_vertices    = mouche.getVertices();
+    GLsizei                          m_vertexCount = mouche.getNumVertices();
+
+    // CREATION DU VBO
     GLuint vbo;
     glGenBuffers(1, &vbo);
 
@@ -54,13 +70,12 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     // remplissage VBO
-    const std::vector<glimac::ShapeVertex> vertices = glimac::sphere_vertices(1.f, 32, 16);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glimac::ShapeVertex), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(glimac::ShapeVertex), m_vertices.data(), GL_STATIC_DRAW);
 
     // debinder le VBO
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // création du VAO
+    // création du vao
     GLuint vao;
     glGenVertexArrays(1, &vao);
 
@@ -69,18 +84,34 @@ int main()
 
     // activation des attributs de vertex
     static constexpr GLuint VERTEX_ATTR_POSITION = 0;
-    static constexpr GLuint VERTEX_NORMAL        = 1;
+    static constexpr GLuint VERTEX_ATTR_NORMAL   = 1;
+    // static constexpr GLuint VERTEX_ATTR_TEXCOORDS = 2;
 
     glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
-    glEnableVertexAttribArray(VERTEX_NORMAL);
-
-    // spécification des attributs de vertex
+    glEnableVertexAttribArray(VERTEX_ATTR_NORMAL);
+    // glEnableVertexAttribArray(VERTEX_ATTR_TEXCOORDS);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glVertexAttribPointer(VERTEX_ATTR_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, position));
-    glVertexAttribPointer(VERTEX_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, normal));
+
+    glVertexAttribPointer(VERTEX_ATTR_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, position)); // specification des attributs de vertex
+
+    glVertexAttribPointer(VERTEX_ATTR_NORMAL, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, normal));
+
+    // // activation des attributs de vertex
+    // static constexpr GLuint VERTEX_ATTR_POSITION = 0;
+    // static constexpr GLuint VERTEX_NORMAL        = 1;
+    // static constexpr GLuint TEXT_COORD           = 2;
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+
+    // // spécification des attributs de vertex
+    // glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    // glVertexAttribPointer(VERTEX_ATTR_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, position));
+    // glVertexAttribPointer(VERTEX_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, normal));
+    // glVertexAttribPointer(TEXT_COORD, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, texCoords));
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glBindVertexArray(0);
 
     Field field(50, ctx);
 
@@ -112,7 +143,7 @@ int main()
             glUniformMatrix4fv(U_MVP_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
             glUniformMatrix4fv(U_MV_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(MVMatrix /*Boids*/));
             glUniformMatrix4fv(U_NORMAL_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
-            glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+            glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
         };
 
         // debinder le vbo
