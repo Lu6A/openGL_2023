@@ -14,6 +14,7 @@
 #include "glm/gtc/random.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/trigonometric.hpp"
+#include "loadingProgram.hpp"
 #include "p6/p6.h"
 
 strengths strengths = {1, 1, 1, 0.06f, glm::length(glm::vec3(0.007f, 0.007f, 0.007f))};
@@ -31,14 +32,13 @@ int main()
         camera.zoom(-scroll.dy);
     };
 
-    /////////////// GESTION DES BOIDS ///////////////
+    /////////////// GESTION DES SHADERS ///////////////
 
-    const p6::Shader shader = p6::load_shader(
-        "shaders/3D.vs.glsl",
-        "shaders/normals.fs.glsl"
-    );
+    Program program;
 
-    shader.use();
+    ///////////// GESTION DES TEXTURES ///////////////
+
+    program.use();
 
     GLuint U_MVP_MATRIX_LOCATION    = glGetUniformLocation(shader.id(), "uMVPMatrix");
     GLuint U_MV_MATRIX_LOCATION     = glGetUniformLocation(shader.id(), "uMVMatrix");
