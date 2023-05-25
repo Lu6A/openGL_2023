@@ -27,4 +27,9 @@ public:
     void                             loadModel(const std::string& fileName);
     std::vector<glimac::ShapeVertex> getVertices() const { return m_vertices; }
     GLsizei                          getNumVertices() const { return m_vertexCount; }
+    void                             createVBO();
+    void                             createVAO();
+
+    GLuint get_vbo() { return m_vbo; };
+    GLuint get_vao() { return m_vao; };
 };
