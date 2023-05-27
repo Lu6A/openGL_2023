@@ -14,6 +14,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/trigonometric.hpp"
 #include "loadingProgram.hpp"
+#include "mainCharacter.hpp"
 #include "model.hpp"
 #include "p6/p6.h"
 
@@ -24,6 +25,8 @@ int main()
     // creation du contexte p6
     auto ctx = p6::Context{{800, 600, "Boids"}};
     ctx.maximize_window();
+
+    MainCharacter nemo = MainCharacter();
 
     ///////////// GESTION DE LA CAMERA ///////////////
 
@@ -47,12 +50,18 @@ int main()
     Model mouche = Model();
     mouche.loadModel("fly.obj");
 
+    Model MouchePrincipale = Model();
+    MouchePrincipale.loadModel("fly.obj");
+
     glEnable(GL_DEPTH_TEST);
 
     ////gestion des VBO////
 
     mouche.createVBO();
     mouche.createVAO();
+
+    MouchePrincipale.createVBO();
+    MouchePrincipale.createVAO();
 
     ///////////// GESTION DES BOIDS ///////////////
     Field field(50, ctx);
@@ -62,6 +71,48 @@ int main()
         field.applyRules(strengths);
 
         program._program.use();
+
+        ///////////// GESTION DES MOUVEMENTS DU PERSONNAGE ///////////////
+
+        ctx.key_pressed = [&nemo](p6::Key key) {
+            if (key.physical == GLFW_KEY_LEFT)
+            {
+                nemo.moveLeft();
+            }
+            if (key.physical == GLFW_KEY_RIGHT)
+            {
+                nemo.moveRight();
+            }
+            if (key.physical == GLFW_KEY_UP)
+            {
+                nemo.moveUp();
+            }
+            if (key.physical == GLFW_KEY_DOWN)
+            {
+                nemo.moveDown();
+            }
+        };
+
+        ctx.key_released = [&nemo](p6::Key key) {
+            if (key.physical == GLFW_KEY_LEFT)
+            {
+                nemo.stopMovement();
+            }
+            if (key.physical == GLFW_KEY_RIGHT)
+            {
+                nemo.stopMovement();
+            }
+            if (key.physical == GLFW_KEY_UP)
+            {
+                nemo.stopMovement();
+            }
+            if (key.physical == GLFW_KEY_DOWN)
+            {
+                nemo.stopMovement();
+            }
+        };
+
+        nemo.update();
 
         ///////////// GESTION DE LA CAMERA ///////////////
         glm::mat4 viewMatrix = camera.getViewMatrix();
@@ -91,6 +142,19 @@ int main()
         };
 
         // debinder le vbo
+        glBindVertexArray(0);
+
+        glBindVertexArray(MouchePrincipale.get_vao());
+        MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
+        MVMatrix = glm::translate(MVMatrix, nemo.getPosition());
+        MVMatrix = glm::scale(MVMatrix, glm::vec3{0.5f});
+        MVMatrix = viewMatrix * MVMatrix;
+
+        glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+        glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+        glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+        glDrawArrays(GL_TRIANGLES, 0, MouchePrincipale.getVertices().size());
+
         glBindVertexArray(0);
     };
 
