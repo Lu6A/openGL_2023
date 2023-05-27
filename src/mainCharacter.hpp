@@ -1,11 +1,13 @@
 
 #pragma once
 #include <glm/glm.hpp>
+#include "glimac/freeflyCamera.hpp"
 
 class MainCharacter {
 private:
     glm::vec3 m_position;
     glm::vec3 m_velocity;
+    // FreeflyCamera camera;
 
 public:
     MainCharacter()

@@ -6,7 +6,6 @@
 #include "glimac/common.hpp"
 #include "glimac/freeflyCamera.hpp"
 #include "glimac/sphere_vertices.hpp"
-#include "glimac/trackballCamera.hpp"
 #include "glm/ext/quaternion_trigonometric.hpp"
 #include "glm/ext/scalar_constants.hpp"
 #include "glm/fwd.hpp"
@@ -30,11 +29,21 @@ int main()
 
     ///////////// GESTION DE LA CAMERA ///////////////
 
-    TrackballCamera camera;
+    FreeflyCamera camera;
+    glm::mat4     viewCamera = camera.getViewMatrix();
 
-    ctx.mouse_scrolled = [&](p6::MouseScroll scroll) {
-        camera.zoom(-scroll.dy);
-    };
+    bool right_rot  = false;
+    bool left_rot   = false;
+    bool up_rot     = false;
+    bool down_rot   = false;
+    bool right_move = false;
+    bool left_move  = false;
+    bool front_move = false;
+    bool back_move  = false;
+
+    // ctx.mouse_scrolled = [&](p6::MouseScroll scroll) {
+    //     camera.zoom(-scroll.dy);
+    // };
 
     /////////////// GESTION DES SHADERS ///////////////
 
@@ -72,50 +81,104 @@ int main()
 
         program._program.use();
 
+        ///////////// GESTION DE LA CAMERA ///////////////
+
+        if (right_rot)
+        {
+            camera.rotateLeft(-1.f);
+        }
+        if (left_rot)
+        {
+            camera.rotateLeft(1.f);
+        }
+        if (up_rot)
+        {
+            camera.rotateUp(1.f);
+        }
+        if (down_rot)
+        {
+            camera.rotateUp(-1.f);
+        }
+        if (left_move)
+        {
+            // camera.moveLeft(0.5f);
+            nemo.moveLeft();
+        }
+        if (right_move)
+        {
+            // camera.moveLeft(-0.5f);
+            nemo.moveRight();
+        }
+        if (front_move)
+        {
+            // camera.moveFront(-0.5f);
+            nemo.moveForward();
+        }
+        if (back_move)
+        {
+            // camera.moveFront(0.5f);
+            nemo.moveBackward();
+        }
+
         ///////////// GESTION DES MOUVEMENTS DU PERSONNAGE ///////////////
 
-        ctx.key_pressed = [&nemo](p6::Key key) {
+        ctx.key_pressed = [&left_move, &right_move, &front_move, &back_move](p6::Key key) {
             if (key.physical == GLFW_KEY_LEFT)
             {
-                nemo.moveLeft();
+                left_move = true;
             }
             if (key.physical == GLFW_KEY_RIGHT)
             {
-                nemo.moveRight();
+                right_move = true;
             }
             if (key.physical == GLFW_KEY_UP)
             {
-                nemo.moveUp();
+                front_move = true;
             }
             if (key.physical == GLFW_KEY_DOWN)
             {
-                nemo.moveDown();
+                back_move = true;
             }
         };
 
-        ctx.key_released = [&nemo](p6::Key key) {
+        ctx.key_released = [&left_move, &right_move, &front_move, &back_move, &nemo](p6::Key key) {
             if (key.physical == GLFW_KEY_LEFT)
             {
+                left_move = false;
                 nemo.stopMovement();
             }
             if (key.physical == GLFW_KEY_RIGHT)
             {
+                right_move = false;
                 nemo.stopMovement();
             }
             if (key.physical == GLFW_KEY_UP)
             {
+                front_move = false;
                 nemo.stopMovement();
             }
             if (key.physical == GLFW_KEY_DOWN)
             {
+                back_move = false;
                 nemo.stopMovement();
             }
         };
+
+        ctx.mouse_dragged = [&camera](const p6::MouseDrag& button) {
+            camera.rotateLeft(button.delta.x * 5);
+            camera.rotateUp(-button.delta.y * 5);
+        };
+
+        ctx.mouse_scrolled = [&](p6::MouseScroll scroll) {
+            camera.moveFront(-scroll.dy);
+        };
+
+        glm::mat4 viewMatrix = camera.getViewMatrix();
 
         nemo.update();
 
         ///////////// GESTION DE LA CAMERA ///////////////
-        glm::mat4 viewMatrix = camera.getViewMatrix();
+        // glm::mat4 viewMatrix = camera.getViewMatrix();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -147,7 +210,7 @@ int main()
         glBindVertexArray(MouchePrincipale.get_vao());
         MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
         MVMatrix = glm::translate(MVMatrix, nemo.getPosition());
-        MVMatrix = glm::scale(MVMatrix, glm::vec3{0.5f});
+        MVMatrix = glm::scale(MVMatrix, glm::vec3{0.05f});
         MVMatrix = viewMatrix * MVMatrix;
 
         glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
@@ -156,6 +219,8 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, MouchePrincipale.getVertices().size());
 
         glBindVertexArray(0);
+
+        camera.followCharacter(nemo.getPosition());
     };
 
     ctx.start();
