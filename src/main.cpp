@@ -25,7 +25,7 @@ int main()
     auto ctx = p6::Context{{800, 600, "Boids"}};
     ctx.maximize_window();
 
-    MainCharacter nemo = MainCharacter();
+    MainCharacter mainCharacter = MainCharacter();
 
     ///////////// GESTION DE LA CAMERA ///////////////
 
@@ -59,8 +59,8 @@ int main()
     Model mouche = Model();
     mouche.loadModel("fly.obj");
 
-    Model MouchePrincipale = Model();
-    MouchePrincipale.loadModel("fly.obj");
+    Model tortue = Model();
+    tortue.loadModel("turtle.obj");
 
     glEnable(GL_DEPTH_TEST);
 
@@ -69,8 +69,8 @@ int main()
     mouche.createVBO();
     mouche.createVAO();
 
-    MouchePrincipale.createVBO();
-    MouchePrincipale.createVAO();
+    tortue.createVBO();
+    tortue.createVAO();
 
     ///////////// GESTION DES BOIDS ///////////////
     Field field(50, ctx);
@@ -102,22 +102,22 @@ int main()
         if (left_move)
         {
             // camera.moveLeft(0.5f);
-            nemo.moveLeft();
+            mainCharacter.moveLeft();
         }
         if (right_move)
         {
             // camera.moveLeft(-0.5f);
-            nemo.moveRight();
+            mainCharacter.moveRight();
         }
         if (front_move)
         {
             // camera.moveFront(-0.5f);
-            nemo.moveForward();
+            mainCharacter.moveForward();
         }
         if (back_move)
         {
             // camera.moveFront(0.5f);
-            nemo.moveBackward();
+            mainCharacter.moveBackward();
         }
 
         ///////////// GESTION DES MOUVEMENTS DU PERSONNAGE ///////////////
@@ -141,26 +141,26 @@ int main()
             }
         };
 
-        ctx.key_released = [&left_move, &right_move, &front_move, &back_move, &nemo](p6::Key key) {
+        ctx.key_released = [&left_move, &right_move, &front_move, &back_move, &mainCharacter](p6::Key key) {
             if (key.physical == GLFW_KEY_LEFT)
             {
                 left_move = false;
-                nemo.stopMovement();
+                mainCharacter.stopMovement();
             }
             if (key.physical == GLFW_KEY_RIGHT)
             {
                 right_move = false;
-                nemo.stopMovement();
+                mainCharacter.stopMovement();
             }
             if (key.physical == GLFW_KEY_UP)
             {
                 front_move = false;
-                nemo.stopMovement();
+                mainCharacter.stopMovement();
             }
             if (key.physical == GLFW_KEY_DOWN)
             {
                 back_move = false;
-                nemo.stopMovement();
+                mainCharacter.stopMovement();
             }
         };
 
@@ -175,7 +175,7 @@ int main()
 
         glm::mat4 viewMatrix = camera.getViewMatrix();
 
-        nemo.update();
+        mainCharacter.update();
 
         ///////////// GESTION DE LA CAMERA ///////////////
         // glm::mat4 viewMatrix = camera.getViewMatrix();
@@ -207,20 +207,20 @@ int main()
         // debinder le vbo
         glBindVertexArray(0);
 
-        glBindVertexArray(MouchePrincipale.get_vao());
+        glBindVertexArray(tortue.get_vao());
         MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
-        MVMatrix = glm::translate(MVMatrix, nemo.getPosition());
+        MVMatrix = glm::translate(MVMatrix, mainCharacter.getPosition());
         MVMatrix = glm::scale(MVMatrix, glm::vec3{0.05f});
         MVMatrix = viewMatrix * MVMatrix;
 
         glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
         glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
         glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
-        glDrawArrays(GL_TRIANGLES, 0, MouchePrincipale.getVertices().size());
+        glDrawArrays(GL_TRIANGLES, 0, tortue.getVertices().size());
 
         glBindVertexArray(0);
 
-        camera.followCharacter(nemo.getPosition());
+        camera.followCharacter(mainCharacter.getPosition());
     };
 
     ctx.start();
