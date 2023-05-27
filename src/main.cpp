@@ -56,8 +56,8 @@ int main()
     ///////////// GESTION DES OBJETS ///////////////
 
     ////chargement des modèles////
-    Model mouche = Model();
-    mouche.loadModel("fly.obj");
+    Model nemo = Model();
+    nemo.loadModel("nemo.obj");
 
     Model tortue = Model();
     tortue.loadModel("turtle.obj");
@@ -66,8 +66,8 @@ int main()
 
     ////gestion des VBO////
 
-    mouche.createVBO();
-    mouche.createVAO();
+    nemo.createVBO();
+    nemo.createVAO();
 
     tortue.createVBO();
     tortue.createVAO();
@@ -186,7 +186,7 @@ int main()
         glm::mat4 MVMatrix     = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
         glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
 
-        glBindVertexArray(mouche.get_vao());
+        glBindVertexArray(nemo.get_vao());
 
         for (size_t i = 0; i < field.getBoids().size(); i++)
         {
@@ -201,7 +201,7 @@ int main()
             glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
             glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
             glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
-            glDrawArrays(GL_TRIANGLES, 0, mouche.getVertices().size());
+            glDrawArrays(GL_TRIANGLES, 0, nemo.getVertices().size());
         };
 
         // debinder le vbo
