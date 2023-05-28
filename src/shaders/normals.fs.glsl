@@ -1,14 +1,12 @@
 #version 330 core
 
-//in vec3 vVertexNormalVS;
-//in vec2 vTextCoord;
+in vec3 vPosition_vs;
+in vec3 vNormal_vs;
+in vec2 vTextCoords;
+
 out vec4 fFragColor;
 
-//uniform sampler2D uTexture;
-
-void main()
-{
-    vec3 color = vec3(0.66f, 0.09f, 0.09f);
-    fFragColor = vec4(color.xyz, 1.f);
+void main(){
+    fFragColor = vec4(vec3(normalize(vNormal_vs)), 1.);
 }
 

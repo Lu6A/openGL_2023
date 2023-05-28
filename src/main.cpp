@@ -49,7 +49,7 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     // Création des coordonnées des sommets du cube
-    float              cubeSize     = 0.2f;
+    float              cubeSize     = 0.7f;
     std::vector<float> cubeVertices = {
         -cubeSize, -cubeSize, -cubeSize,
         cubeSize, -cubeSize, -cubeSize,

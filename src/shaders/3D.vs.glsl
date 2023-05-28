@@ -1,32 +1,33 @@
 #version 330 core
 
+//Attributs des sommets
+
 layout(location = 0) in vec3 aVertexPosition;
 layout(location = 1) in vec3 aVertexNormal;
-//layout(location = 2) in vec2 aVertexTexCoords;
+layout(location = 2) in vec2 aVertexTextCoords;
 
-// Variables de sorties
-out vec3 vVertexPosition;
-out vec3 vVertexNormal;
-//out vec2 vVertexTexCoords;
+//Matrices uniformes (on les passent depuis le main)
 
-//Matrices de transformations
-uniform mat4 uMVPMatrix;
-uniform mat4 uMVMatrix;
+uniform mat4 uMVPMatrix; 
+uniform mat4 uMVMatrix; 
 uniform mat4 uNormalMatrix;
 
+//variables de sortie
+out vec3 vPosition_vs; 
+out vec3 vNormal_vs; 
+out vec2 vTextCoords; 
 
-void main()
-{
-  //Passage en coordonnées homogènes
-  vec4 vertexPosition = vec4(aVertexPosition, 1);
-  vec4 vertexNormal = vec4(aVertexNormal, 1);
-  
-  //Calcul des variables de sorties
-  vVertexPosition = vec3(uMVMatrix * vertexPosition);
-  vVertexNormal = vec3(uNormalMatrix * vertexNormal);
-  //vVertexTexCoords = aVertexTexCoords;
-  
-  gl_Position = uMVPMatrix * vertexPosition;
+void main(){
 
+    //passages en coordonnées homogènes (4 element 1 pour position et 0 pour vecteur)
+    vec4 vertexPosition = vec4(aVertexPosition, 1);
+    vec4 vertexNormal = vec4(aVertexNormal, 0);
+
+    //calcul des valeurs de sortie
+    vPosition_vs = vec3(uMVMatrix * vertexPosition);
+    vNormal_vs = vec3(uNormalMatrix*vertexNormal);
+    vTextCoords = aVertexTextCoords;
+
+    //calcul de la position projetée
+    gl_Position = uMVPMatrix * vertexPosition;
 }
-
