@@ -49,7 +49,7 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     // Création des coordonnées des sommets du cube
-    float              cubeSize     = 10.0f;
+    float              cubeSize     = 0.2f;
     std::vector<float> cubeVertices = {
         -cubeSize, -cubeSize, -cubeSize,
         cubeSize, -cubeSize, -cubeSize,
@@ -139,6 +139,8 @@ int main()
 
     Field field(50, ctx);
 
+    glm::mat4 cubeModelMatrix = glm::mat4(1.0f); // Matrice de modèle fixe pour le cube
+
     ctx.update = [&]() {
         shader.use();
 
@@ -153,14 +155,18 @@ int main()
         // Dessiner le cube
         glBindVertexArray(cubeVao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIbo);
+
+        glm::mat4 MVMatrix   = viewMatrix * cubeModelMatrix; // Utiliser la matrice de modèle fixe
+        glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), 800.f / 600.f, 0.1f, 100.f);
+        glm::mat4 NormalMatrix;
+
+        glUniformMatrix4fv(U_MVP_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+        glUniformMatrix4fv(U_MV_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+        glUniformMatrix4fv(U_NORMAL_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
         glDrawElements(GL_TRIANGLES, cubeIndices.size(), GL_UNSIGNED_INT, 0);
 
         // Dessiner les modèles "fly.obj"
         glBindVertexArray(vao);
-
-        glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), 800.f / 600.f, 0.1f, 100.f);
-        glm::mat4 MVMatrix     = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
-        glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
 
         for (size_t i = 0; i < field.getBoids().size(); i++)
         {
@@ -169,8 +175,11 @@ int main()
             MVMatrix = glm::scale(MVMatrix, glm::vec3{0.02f});
             MVMatrix = viewMatrix * MVMatrix;
 
+            ProjMatrix   = glm::perspective(glm::radians(70.f), 800.f / 600.f, 0.1f, 100.f);
+            NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
+
             glUniformMatrix4fv(U_MVP_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
-            glUniformMatrix4fv(U_MV_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(MVMatrix /*Boids*/));
+            glUniformMatrix4fv(U_MV_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(MVMatrix));
             glUniformMatrix4fv(U_NORMAL_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
             glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
         };
