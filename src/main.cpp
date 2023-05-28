@@ -48,9 +48,51 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
 
-    Cube cube(0.5);
-    shader.use();
-    cube.draw();
+    // Création des coordonnées des sommets du cube
+    float              cubeSize     = 10.0f;
+    std::vector<float> cubeVertices = {
+        -cubeSize, -cubeSize, -cubeSize,
+        cubeSize, -cubeSize, -cubeSize,
+        cubeSize, cubeSize, -cubeSize,
+        -cubeSize, cubeSize, -cubeSize,
+        -cubeSize, -cubeSize, cubeSize,
+        cubeSize, -cubeSize, cubeSize,
+        cubeSize, cubeSize, cubeSize,
+        -cubeSize, cubeSize, cubeSize};
+
+    std::vector<GLuint> cubeIndices = {
+        0, 1, 2, 2, 3, 0, // face avant
+        1, 5, 6, 6, 2, 1, // face droite
+        4, 7, 6, 6, 5, 4, // face arrière
+        7, 3, 0, 0, 4, 7, // face gauche
+        4, 5, 1, 1, 0, 4, // face basse
+        3, 2, 6, 6, 7, 3  // face haute
+    };
+
+    // Création du VBO du cube
+    GLuint cubeVbo;
+    glGenBuffers(1, &cubeVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVbo);
+    glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * sizeof(float), cubeVertices.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // Création de l'IBO du cube
+    GLuint cubeIbo;
+    glGenBuffers(1, &cubeIbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIbo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, cubeIndices.size() * sizeof(GLuint), cubeIndices.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    // Création du VAO du cube
+    GLuint cubeVao;
+    glGenVertexArrays(1, &cubeVao);
+    glBindVertexArray(cubeVao);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVbo);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
+
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 
     Model mouche = Model();
 
@@ -99,7 +141,7 @@ int main()
 
     ctx.update = [&]() {
         shader.use();
-        cube.draw();
+
         std::vector<glm::vec3> positions = field.fieldDraw(ctx);
         field.applyRules(strengths);
 
@@ -107,26 +149,33 @@ int main()
         glm::mat4 viewMatrix = camera.getViewMatrix();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Dessiner le cube
+        glBindVertexArray(cubeVao);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIbo);
+        glDrawElements(GL_TRIANGLES, cubeIndices.size(), GL_UNSIGNED_INT, 0);
+
+        // Dessiner les modèles "fly.obj"
         glBindVertexArray(vao);
 
         glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), 800.f / 600.f, 0.1f, 100.f);
         glm::mat4 MVMatrix     = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
         glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
 
-        // for (size_t i = 0; i < field.getBoids().size(); i++)
-        // {
-        //     MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f}); // Translation
-        //     MVMatrix = glm::translate(MVMatrix, positions[i]);          // Translation * Rotation * Translation
-        //     MVMatrix = glm::scale(MVMatrix, glm::vec3{0.02f});
-        //     MVMatrix = viewMatrix * MVMatrix;
+        for (size_t i = 0; i < field.getBoids().size(); i++)
+        {
+            MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f}); // Translation
+            MVMatrix = glm::translate(MVMatrix, positions[i]);          // Translation * Rotation * Translation
+            MVMatrix = glm::scale(MVMatrix, glm::vec3{0.02f});
+            MVMatrix = viewMatrix * MVMatrix;
 
-        //     glUniformMatrix4fv(U_MVP_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
-        //     glUniformMatrix4fv(U_MV_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(MVMatrix /*Boids*/));
-        //     glUniformMatrix4fv(U_NORMAL_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
-        //     glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
-        // };
+            glUniformMatrix4fv(U_MVP_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+            glUniformMatrix4fv(U_MV_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(MVMatrix /*Boids*/));
+            glUniformMatrix4fv(U_NORMAL_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+            glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
+        };
 
-        // debinder le vbo
+        // Débinder les VAO
         glBindVertexArray(0);
     };
 
