@@ -12,6 +12,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/trigonometric.hpp"
+#include "img/src/Image.h"
 #include "loadingProgram.hpp"
 #include "mainCharacter.hpp"
 #include "model.hpp"
@@ -51,11 +52,34 @@ int main()
 
     ///////////// GESTION DES TEXTURES ///////////////
 
+    img::Image nemoMap   = p6::load_image_buffer("assets/textures/clownfish.png");
+    img::Image tortueMap = p6::load_image_buffer("assets/textures/rock_wall_diff_2k.jpg");
+
     program._program.use();
+
+    GLuint texNemo = 0;
+    glGenTextures(1, &texNemo);
+
+    glBindTexture(GL_TEXTURE_2D, texNemo);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nemoMap.width(), nemoMap.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nemoMap.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    GLuint texTortue = 0;
+    glGenTextures(1, &texTortue);
+
+    glBindTexture(GL_TEXTURE_2D, texTortue);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tortueMap.width(), tortueMap.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, tortueMap.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // glBindTexture(GL_TEXTURE_2D, 0);
 
     ///////////// GESTION DES OBJETS ///////////////
 
-    ////chargement des modèles////
+    // chargement des modèles////
     Model nemo = Model();
     nemo.loadModel("nemo.obj");
 
@@ -186,13 +210,17 @@ int main()
         glm::mat4 MVMatrix     = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
         glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
 
-        glBindVertexArray(nemo.get_vao());
+        glBindVertexArray(nemo.getVao());
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texNemo); // bind txt moon à la place
+        glUniform1i(program.uTexture, 0);
 
         for (size_t i = 0; i < field.getBoids().size(); i++)
         {
             MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f}); // Translation
             MVMatrix = glm::translate(MVMatrix, positions[i]);          // Translation * Rotation * Translation
-            MVMatrix = glm::scale(MVMatrix, glm::vec3{0.02f});
+            MVMatrix = glm::scale(MVMatrix, glm::vec3{1.f});
             MVMatrix = viewMatrix * MVMatrix;
             // glm::mat4 MVMatrixBoids = glm::translate(glm::mat4{1.f}, {1.f, 1.f, -1.f}); // Translation
             // MVMatrixBoids           = glm::translate(MVMatrixBoids, positions[i]);      // Translation * Rotation * Translation
@@ -207,10 +235,15 @@ int main()
         // debinder le vbo
         glBindVertexArray(0);
 
-        glBindVertexArray(tortue.get_vao());
+        glBindVertexArray(tortue.getVao());
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texTortue); // bind txt tortue à la place
+        glUniform1i(program.uTexture, 0);
+
         MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
         MVMatrix = glm::translate(MVMatrix, mainCharacter.getPosition());
-        MVMatrix = glm::scale(MVMatrix, glm::vec3{0.05f});
+        MVMatrix = glm::scale(MVMatrix, glm::vec3{2.f});
         MVMatrix = viewMatrix * MVMatrix;
 
         glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
@@ -224,4 +257,9 @@ int main()
     };
 
     ctx.start();
+
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDeleteTextures(1, &texNemo);
+    glDeleteTextures(1, &texTortue);
 }

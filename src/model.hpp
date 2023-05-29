@@ -30,6 +30,6 @@ public:
     void                             createVBO();
     void                             createVAO();
 
-    GLuint get_vbo() { return m_vbo; };
-    GLuint get_vao() { return m_vao; };
+    GLuint getVbo() { return m_vbo; };
+    GLuint getVao() { return m_vao; };
 };

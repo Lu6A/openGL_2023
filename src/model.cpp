@@ -51,8 +51,8 @@ void Model::loadModel(const std::string& fileName)
             vertex.normal.z = attrib.normals[3 * index.normal_index + 2];
 
             // You can also retrieve texture coordinates if needed
-            // vertex.texCoords.x = attrib.texcoords[2 * index.texcoord_index + 0];
-            // vertex.texCoords.y = attrib.texcoords[2 * index.texcoord_index + 1];
+            vertex.texCoords.x = attrib.texcoords[2 * index.texcoord_index + 0];
+            vertex.texCoords.y = attrib.texcoords[2 * index.texcoord_index + 1];
 
             m_vertices.push_back(vertex);
         }
@@ -92,17 +92,17 @@ void Model::createVAO()
     // binding vbo
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-    const GLuint VERTEX_ATTR_POSITION = 0;
-    const GLuint VERTEX_ATTR_NORMAL   = 1;
-    // const GLuint VERTEX_ATTR_TEXCOORDS = 2;
+    const GLuint VERTEX_ATTR_POSITION  = 0;
+    const GLuint VERTEX_ATTR_NORMAL    = 1;
+    const GLuint VERTEX_ATTR_TEXCOORDS = 2;
 
     glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
     glEnableVertexAttribArray(VERTEX_ATTR_NORMAL);
-    // glEnableVertexAttribArray(VERTEX_ATTR_TEXCOORDS);
+    glEnableVertexAttribArray(VERTEX_ATTR_TEXCOORDS);
 
     glVertexAttribPointer(VERTEX_ATTR_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, position));
     glVertexAttribPointer(VERTEX_ATTR_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, normal));
-    // glVertexAttribPointer(VERTEX_ATTR_TEXCOORDS, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex),(const GLvoid*)offsetof(glimac::ShapeVertex, texCoords));
+    glVertexAttribPointer(VERTEX_ATTR_TEXCOORDS, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, texCoords));
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);

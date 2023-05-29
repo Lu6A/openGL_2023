@@ -29,10 +29,10 @@ struct Program {
     // GLint uShininess;
 
     // textures
-    // GLint uTexture;
+    GLint uTexture;
 
     Program()
-        : _program{p6::load_shader("shaders/3D.vs.glsl", "shaders/normals.fs.glsl")}
+        : _program{p6::load_shader("shaders/3D.vs.glsl", "shaders/text3D.fs.glsl")}
     {
         uMVPMatrix    = glGetUniformLocation(_program.id(), "uMVPMatrix");
         uMVMatrix     = glGetUniformLocation(_program.id(), "uMVMatrix");
@@ -49,6 +49,6 @@ struct Program {
         // uKs        = glGetUniformLocation(_program.id(), "uKs");
         // uShininess = glGetUniformLocation(_program.id(), "uShininess");
 
-        // uTexture = glGetUniformLocation(_program.id(), "uTexture");
+        uTexture = glGetUniformLocation(_program.id(), "uTexture");
     }
 };
