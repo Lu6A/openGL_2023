@@ -6,12 +6,15 @@
 #include "glimac/common.hpp"
 #include "glimac/freeflyCamera.hpp"
 #include "glimac/sphere_vertices.hpp"
-#include "glimac/trackballCamera.hpp"
 #include "glm/ext/quaternion_trigonometric.hpp"
 #include "glm/ext/scalar_constants.hpp"
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "glm/trigonometric.hpp"
+#include "img/src/Image.h"
+#include "loadingProgram.hpp"
+#include "mainCharacter.hpp"
 #include "model.hpp"
 #include "p6/p6.h"
 
@@ -23,133 +26,240 @@ int main()
     auto ctx = p6::Context{{800, 600, "Boids"}};
     ctx.maximize_window();
 
+    MainCharacter mainCharacter = MainCharacter();
+
     ///////////// GESTION DE LA CAMERA ///////////////
 
-    TrackballCamera camera;
+    FreeflyCamera camera;
+    glm::mat4     viewCamera = camera.getViewMatrix();
 
-    ctx.mouse_scrolled = [&](p6::MouseScroll scroll) {
-        camera.zoom(-scroll.dy);
-    };
+    bool right_rot  = false;
+    bool left_rot   = false;
+    bool up_rot     = false;
+    bool down_rot   = false;
+    bool right_move = false;
+    bool left_move  = false;
+    bool front_move = false;
+    bool back_move  = false;
 
-    /////////////// GESTION DES BOIDS ///////////////
+    // ctx.mouse_scrolled = [&](p6::MouseScroll scroll) {
+    //     camera.zoom(-scroll.dy);
+    // };
 
-    // chargement des shaders
-    const p6::Shader shader = p6::load_shader(
-        "shaders/3D.vs.glsl",
-        "shaders/normals.fs.glsl"
-    );
-    shader.use();
+    /////////////// GESTION DES SHADERS ///////////////
 
-    // // récupération des locations de variables uniformes
-    GLuint U_MVP_MATRIX_LOCATION    = glGetUniformLocation(shader.id(), "uMVPMatrix");
-    GLuint U_MV_MATRIX_LOCATION     = glGetUniformLocation(shader.id(), "uMVMatrix");
-    GLuint U_NORMAL_MATRIX_LOCATION = glGetUniformLocation(shader.id(), "uNormalMatrix");
-    // GLint  U_TEXTURE_1              = glGetUniformLocation(shader.id(), "uTexture1");
-    // GLint  U_TEXTURE_2              = glGetUniformLocation(shader.id(), "uTexture2");
+    Program program;
+
+    ///////////// GESTION DES TEXTURES ///////////////
+
+    img::Image nemoMap   = p6::load_image_buffer("assets/textures/clownfish.png");
+    img::Image tortueMap = p6::load_image_buffer("assets/textures/rock_wall_diff_2k.jpg");
+
+    program._program.use();
+
+    GLuint texNemo = 0;
+    glGenTextures(1, &texNemo);
+
+    glBindTexture(GL_TEXTURE_2D, texNemo);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nemoMap.width(), nemoMap.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nemoMap.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    GLuint texTortue = 0;
+    glGenTextures(1, &texTortue);
+
+    glBindTexture(GL_TEXTURE_2D, texTortue);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tortueMap.width(), tortueMap.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, tortueMap.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // glBindTexture(GL_TEXTURE_2D, 0);
+
+    ///////////// GESTION DES OBJETS ///////////////
+
+    // chargement des modèles////
+    Model nemo = Model();
+    nemo.loadModel("nemo.obj");
+
+    Model tortue = Model();
+    tortue.loadModel("turtle.obj");
 
     glEnable(GL_DEPTH_TEST);
 
-    // // matrices ?
-    // glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.0f), 800.0f / 600.0f, 0.1f, 100.0f); // param perspective(float fovy, float aspect, float znear, float far)
-    // glm::mat4 MVMatrix     = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
-    // glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
+    ////gestion des VBO////
 
-    Model mouche = Model();
+    nemo.createVBO();
+    nemo.createVAO();
 
-    mouche.loadModel("fly.obj");
-    // Get the vertices and number of vertices
-    std::vector<glimac::ShapeVertex> m_vertices    = mouche.getVertices();
-    GLsizei                          m_vertexCount = mouche.getNumVertices();
+    tortue.createVBO();
+    tortue.createVAO();
 
-    // CREATION DU VBO
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-
-    // binding du vbo
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    // remplissage VBO
-    glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(glimac::ShapeVertex), m_vertices.data(), GL_STATIC_DRAW);
-
-    // debinder le VBO
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // création du vao
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-
-    // binder le VAO
-    glBindVertexArray(vao);
-
-    // activation des attributs de vertex
-    static constexpr GLuint VERTEX_ATTR_POSITION = 0;
-    static constexpr GLuint VERTEX_ATTR_NORMAL   = 1;
-    // static constexpr GLuint VERTEX_ATTR_TEXCOORDS = 2;
-
-    glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
-    glEnableVertexAttribArray(VERTEX_ATTR_NORMAL);
-    // glEnableVertexAttribArray(VERTEX_ATTR_TEXCOORDS);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    glVertexAttribPointer(VERTEX_ATTR_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, position)); // specification des attributs de vertex
-
-    glVertexAttribPointer(VERTEX_ATTR_NORMAL, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, normal));
-
-    // // activation des attributs de vertex
-    // static constexpr GLuint VERTEX_ATTR_POSITION = 0;
-    // static constexpr GLuint VERTEX_NORMAL        = 1;
-    // static constexpr GLuint TEXT_COORD           = 2;
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    // // spécification des attributs de vertex
-    // glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    // glVertexAttribPointer(VERTEX_ATTR_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, position));
-    // glVertexAttribPointer(VERTEX_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, normal));
-    // glVertexAttribPointer(TEXT_COORD, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, texCoords));
-    // glBindBuffer(GL_ARRAY_BUFFER, 0);
-    // glBindVertexArray(0);
-
+    ///////////// GESTION DES BOIDS ///////////////
     Field field(50, ctx);
 
     ctx.update = [&]() {
-        shader.use();
         std::vector<glm::vec3> positions = field.fieldDraw(ctx);
         field.applyRules(strengths);
 
+        program._program.use();
+
         ///////////// GESTION DE LA CAMERA ///////////////
+
+        if (right_rot)
+        {
+            camera.rotateLeft(-1.f);
+        }
+        if (left_rot)
+        {
+            camera.rotateLeft(1.f);
+        }
+        if (up_rot)
+        {
+            camera.rotateUp(1.f);
+        }
+        if (down_rot)
+        {
+            camera.rotateUp(-1.f);
+        }
+        if (left_move)
+        {
+            // camera.moveLeft(0.5f);
+            mainCharacter.moveLeft();
+        }
+        if (right_move)
+        {
+            // camera.moveLeft(-0.5f);
+            mainCharacter.moveRight();
+        }
+        if (front_move)
+        {
+            // camera.moveFront(-0.5f);
+            mainCharacter.moveForward();
+        }
+        if (back_move)
+        {
+            // camera.moveFront(0.5f);
+            mainCharacter.moveBackward();
+        }
+
+        ///////////// GESTION DES MOUVEMENTS DU PERSONNAGE ///////////////
+
+        ctx.key_pressed = [&left_move, &right_move, &front_move, &back_move](p6::Key key) {
+            if (key.physical == GLFW_KEY_LEFT)
+            {
+                left_move = true;
+            }
+            if (key.physical == GLFW_KEY_RIGHT)
+            {
+                right_move = true;
+            }
+            if (key.physical == GLFW_KEY_UP)
+            {
+                front_move = true;
+            }
+            if (key.physical == GLFW_KEY_DOWN)
+            {
+                back_move = true;
+            }
+        };
+
+        ctx.key_released = [&left_move, &right_move, &front_move, &back_move, &mainCharacter](p6::Key key) {
+            if (key.physical == GLFW_KEY_LEFT)
+            {
+                left_move = false;
+                mainCharacter.stopMovement();
+            }
+            if (key.physical == GLFW_KEY_RIGHT)
+            {
+                right_move = false;
+                mainCharacter.stopMovement();
+            }
+            if (key.physical == GLFW_KEY_UP)
+            {
+                front_move = false;
+                mainCharacter.stopMovement();
+            }
+            if (key.physical == GLFW_KEY_DOWN)
+            {
+                back_move = false;
+                mainCharacter.stopMovement();
+            }
+        };
+
+        ctx.mouse_dragged = [&camera](const p6::MouseDrag& button) {
+            camera.rotateLeft(button.delta.x * 5);
+            camera.rotateUp(-button.delta.y * 5);
+        };
+
+        ctx.mouse_scrolled = [&](p6::MouseScroll scroll) {
+            camera.moveFront(-scroll.dy);
+        };
+
         glm::mat4 viewMatrix = camera.getViewMatrix();
 
+        mainCharacter.update();
+
+        ///////////// GESTION DE LA CAMERA ///////////////
+        // glm::mat4 viewMatrix = camera.getViewMatrix();
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glBindVertexArray(vao);
 
         glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), 800.f / 600.f, 0.1f, 100.f);
         glm::mat4 MVMatrix     = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
         glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
 
+        glBindVertexArray(nemo.getVao());
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texNemo); // bind txt moon à la place
+        glUniform1i(program.uTexture, 0);
+
         for (size_t i = 0; i < field.getBoids().size(); i++)
         {
             MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f}); // Translation
             MVMatrix = glm::translate(MVMatrix, positions[i]);          // Translation * Rotation * Translation
-            MVMatrix = glm::scale(MVMatrix, glm::vec3{0.02f});
+            MVMatrix = glm::scale(MVMatrix, glm::vec3{1.f});
             MVMatrix = viewMatrix * MVMatrix;
             // glm::mat4 MVMatrixBoids = glm::translate(glm::mat4{1.f}, {1.f, 1.f, -1.f}); // Translation
             // MVMatrixBoids           = glm::translate(MVMatrixBoids, positions[i]);      // Translation * Rotation * Translation
             // MVMatrixBoids           = glm::scale(MVMatrixBoids, glm::vec3{1., 1., 1.}); // Translation * Rotation * Translation * Scale
             // MVMatrixBoids           = MVMatrix * MVMatrixBoids;
-            glUniformMatrix4fv(U_MVP_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
-            glUniformMatrix4fv(U_MV_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(MVMatrix /*Boids*/));
-            glUniformMatrix4fv(U_NORMAL_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
-            glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
+            glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+            glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+            glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+            glDrawArrays(GL_TRIANGLES, 0, nemo.getVertices().size());
         };
 
         // debinder le vbo
         glBindVertexArray(0);
+
+        glBindVertexArray(tortue.getVao());
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texTortue); // bind txt tortue à la place
+        glUniform1i(program.uTexture, 0);
+
+        MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
+        MVMatrix = glm::translate(MVMatrix, mainCharacter.getPosition());
+        MVMatrix = glm::scale(MVMatrix, glm::vec3{2.f});
+        MVMatrix = viewMatrix * MVMatrix;
+
+        glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+        glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+        glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+        glDrawArrays(GL_TRIANGLES, 0, tortue.getVertices().size());
+
+        glBindVertexArray(0);
+
+        camera.followCharacter(mainCharacter.getPosition());
     };
 
     ctx.start();
-    glDeleteBuffers(1, &vbo);
-    glDeleteVertexArrays(1, &vao);
+
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDeleteTextures(1, &texNemo);
+    glDeleteTextures(1, &texTortue);
 }

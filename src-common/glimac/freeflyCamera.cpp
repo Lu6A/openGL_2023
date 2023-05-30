@@ -34,10 +34,10 @@ void FreeflyCamera::rotateUp(float degrees)
     computeDirectionVectors();
 }
 
-// void FreeflyCamera::follow_character(const glm::vec3 character_position)
-// {
-//     m_position = character_position - m_distance * m_FrontVector;
-// }
+void FreeflyCamera::followCharacter(const glm::vec3 character_position)
+{
+    m_position = character_position - m_distance * m_FrontVector;
+}
 
 glm::mat4 FreeflyCamera::getViewMatrix() const
 {
