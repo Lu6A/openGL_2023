@@ -52,8 +52,9 @@ int main()
 
     ///////////// GESTION DES TEXTURES ///////////////
 
-    img::Image nemoMap   = p6::load_image_buffer("assets/textures/clownfish.png");
-    img::Image tortueMap = p6::load_image_buffer("assets/textures/rock_wall_diff_2k.jpg");
+    img::Image nemoMap          = p6::load_image_buffer("assets/textures/clownfish.png");
+    img::Image tortueMap        = p6::load_image_buffer("assets/textures/rock_wall_diff_2k.jpg");
+    img::Image environnementMap = p6::load_image_buffer("assets/textures/anemone.jpg");
 
     program._program.use();
 
@@ -75,6 +76,18 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    GLuint texEnvironnement = 0;
+    glGenTextures(1, &texEnvironnement);
+
+    glBindTexture(GL_TEXTURE_2D, texEnvironnement);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, environnementMap.width(), environnementMap.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, environnementMap.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     // glBindTexture(GL_TEXTURE_2D, 0);
 
     ///////////// GESTION DES OBJETS ///////////////
@@ -86,6 +99,9 @@ int main()
     Model tortue = Model();
     tortue.loadModel("turtle.obj");
 
+    Model environnement = Model();
+    environnement.loadModel("environnement.obj");
+
     glEnable(GL_DEPTH_TEST);
 
     ////gestion des VBO////
@@ -95,6 +111,9 @@ int main()
 
     tortue.createVBO();
     tortue.createVAO();
+
+    environnement.createVBO();
+    environnement.createVAO();
 
     ///////////// GESTION DES BOIDS ///////////////
     Field field(50, ctx);
@@ -253,6 +272,24 @@ int main()
 
         glBindVertexArray(0);
 
+        glBindVertexArray(environnement.getVao());
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texEnvironnement); // bind txt environnement à la place
+        glUniform1i(program.uTexture, 0);
+
+        MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
+        MVMatrix = glm::translate(MVMatrix, mainCharacter.getPosition());
+        MVMatrix = glm::scale(MVMatrix, glm::vec3{2.f});
+        MVMatrix = viewMatrix * MVMatrix;
+
+        glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+        glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+        glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+        glDrawArrays(GL_TRIANGLES, 0, environnement.getVertices().size());
+
+        glBindVertexArray(0);
+
         camera.followCharacter(mainCharacter.getPosition());
     };
 
@@ -262,4 +299,5 @@ int main()
     glBindTexture(GL_TEXTURE_2D, 0);
     glDeleteTextures(1, &texNemo);
     glDeleteTextures(1, &texTortue);
+    glDeleteTextures(1, &texEnvironnement);
 }
