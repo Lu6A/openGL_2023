@@ -55,6 +55,7 @@ int main()
     img::Image nemoMap          = p6::load_image_buffer("assets/textures/clownfish.png");
     img::Image tortueMap        = p6::load_image_buffer("assets/textures/rock_wall_diff_2k.jpg");
     img::Image environnementMap = p6::load_image_buffer("assets/textures/anemone.jpg");
+    img::Image anchorMap        = p6::load_image_buffer("assets/textures/Metal041C_1K_Color.jpg");
 
     program._program.use();
 
@@ -88,6 +89,16 @@ int main()
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
+    GLuint texAnchor = 0;
+    glGenTextures(1, &texAnchor);
+
+    glBindTexture(GL_TEXTURE_2D, texAnchor);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, anchorMap.width(), anchorMap.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, anchorMap.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     // glBindTexture(GL_TEXTURE_2D, 0);
 
     ///////////// GESTION DES OBJETS ///////////////
@@ -100,7 +111,10 @@ int main()
     tortue.loadModel("turtle.obj");
 
     Model environnement = Model();
-    environnement.loadModel("environnement.obj");
+    environnement.loadModel("environnement - sans ancre.obj");
+
+    Model anchor = Model();
+    anchor.loadModel("anchor.obj");
 
     glEnable(GL_DEPTH_TEST);
 
@@ -114,6 +128,9 @@ int main()
 
     environnement.createVBO();
     environnement.createVAO();
+
+    anchor.createVBO();
+    anchor.createVAO();
 
     ///////////// GESTION DES BOIDS ///////////////
     Field field(50, ctx);
@@ -290,6 +307,24 @@ int main()
 
         glBindVertexArray(0);
 
+        glBindVertexArray(anchor.getVao());
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texAnchor); // bind txt anchor à la place
+        glUniform1i(program.uTexture, 0);
+
+        MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
+        MVMatrix = glm::translate(MVMatrix, mainCharacter.getPosition());
+        MVMatrix = glm::scale(MVMatrix, glm::vec3{2.f});
+        MVMatrix = viewMatrix * MVMatrix;
+
+        glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+        glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+        glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+        glDrawArrays(GL_TRIANGLES, 0, anchor.getVertices().size());
+
+        glBindVertexArray(0);
+
         camera.followCharacter(mainCharacter.getPosition());
     };
 
@@ -300,4 +335,5 @@ int main()
     glDeleteTextures(1, &texNemo);
     glDeleteTextures(1, &texTortue);
     glDeleteTextures(1, &texEnvironnement);
+    glDeleteTextures(1, &texAnchor);
 }
