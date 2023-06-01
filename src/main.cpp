@@ -472,7 +472,7 @@ int main()
         MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, -1.f, 0.f});
         MVMatrix = glm::translate(MVMatrix, mainCharacter.getPosition());
         MVMatrix = glm::scale(MVMatrix, glm::vec3{1.f});
-        MVMatrix = glm::rotate(MVMatrix, glm::radians(90.f), glm::vec3{0.f, 1.f, 0.f});
+        MVMatrix = glm::rotate(MVMatrix, glm::radians(-90.f), glm::vec3{0.f, 1.f, 0.f});
         MVMatrix = viewMatrix * MVMatrix;
 
         glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
