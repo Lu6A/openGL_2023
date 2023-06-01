@@ -24,7 +24,7 @@ void MainCharacter::setRotationAngle(float rotationAngle)
 }
 
 MainCharacter::MainCharacter()
-    : m_position(glm::vec3(0., 0., 5.)), m_Phi(p6::PI), m_Theta(0.), m_RotationAngle(0.)
+    : m_position(glm::vec3(0., -2., 2.)), m_Phi(p6::PI), m_Theta(0.), m_RotationAngle(0.)
 {
     this->computeDirectionVectors();
 }

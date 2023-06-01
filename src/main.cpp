@@ -204,7 +204,7 @@ int main()
     plongeur.createVAO();
 
     ///////////// GESTION DES BOIDS ///////////////
-    Field field(30, ctx);
+    Field field(100, ctx);
 
     ctx.update = [&]() {
         std::vector<glm::vec3> positions = field.fieldDraw(ctx);
