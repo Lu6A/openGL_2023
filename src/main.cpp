@@ -53,8 +53,14 @@ int main()
 
     ///////////// GESTION DES TEXTURES ///////////////
 
-    img::Image nemoMap   = p6::load_image_buffer("assets/textures/clownfish.png");
-    img::Image tortueMap = p6::load_image_buffer("assets/textures/rock_wall_diff_2k.jpg");
+    img::Image nemoMap     = p6::load_image_buffer("assets/textures/clownfish.png");
+    img::Image tortueMap   = p6::load_image_buffer("assets/textures/tortue.jpg");
+    img::Image cubeMap     = p6::load_image_buffer("assets/textures/cube.jpg");
+    img::Image anemone1Map = p6::load_image_buffer("assets/textures/anemone1.jpg");
+    img::Image anemone2Map = p6::load_image_buffer("assets/textures/anemone2.jpg");
+    img::Image ancreMap    = p6::load_image_buffer("assets/textures/ancre.jpg");
+    img::Image plongeurMap = p6::load_image_buffer("assets/textures/plongeur.jpg");
+    img::Image huitreMap   = p6::load_image_buffer("assets/textures/huitre.jpg");
 
     program._program.use();
 
@@ -76,6 +82,68 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    GLuint texCube = 0;
+    glGenTextures(1, &texCube);
+
+    glBindTexture(GL_TEXTURE_2D, texCube);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cubeMap.width(), cubeMap.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, cubeMap.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    GLuint texAncre = 0;
+    glGenTextures(1, &texAncre);
+
+    glBindTexture(GL_TEXTURE_2D, texAncre);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ancreMap.width(), ancreMap.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, ancreMap.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    GLuint texAnemone1 = 0;
+    glGenTextures(1, &texAnemone1);
+
+    glBindTexture(GL_TEXTURE_2D, texAnemone1);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, anemone1Map.width(), anemone1Map.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, anemone1Map.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    GLuint texAnemone2 = 0;
+    glGenTextures(1, &texAnemone2);
+
+    glBindTexture(GL_TEXTURE_2D, texAnemone2);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, anemone2Map.width(), anemone2Map.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, anemone2Map.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    GLuint texPlongeur = 0;
+    glGenTextures(1, &texPlongeur);
+
+    glBindTexture(GL_TEXTURE_2D, texPlongeur);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, plongeurMap.width(), plongeurMap.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, plongeurMap.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    GLuint texHuitre = 0;
+    glGenTextures(1, &texHuitre);
+
+    glBindTexture(GL_TEXTURE_2D, texHuitre);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, huitreMap.width(), huitreMap.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, huitreMap.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     // glBindTexture(GL_TEXTURE_2D, 0);
 
     ///////////// GESTION DES OBJETS ///////////////
@@ -87,6 +155,26 @@ int main()
     Model tortue = Model();
     tortue.loadModel("turtle.obj");
 
+    Model cube = Model();
+    cube.loadModel("cube.obj");
+
+    Model ancre = Model();
+    ancre.loadModel("ancre.obj");
+
+    Model anemone1 = Model();
+    anemone1.loadModel("anemone1.obj");
+    glEnable(GL_DEPTH_TEST);
+
+    Model anemone2 = Model();
+    anemone2.loadModel("anemone2.obj");
+    glEnable(GL_DEPTH_TEST);
+
+    Model plongeur = Model();
+    plongeur.loadModel("plongeur.obj");
+    glEnable(GL_DEPTH_TEST);
+
+    Model huitre = Model();
+    huitre.loadModel("huitre.obj");
     glEnable(GL_DEPTH_TEST);
 
     ////gestion des VBO////
@@ -96,6 +184,24 @@ int main()
 
     tortue.createVBO();
     tortue.createVAO();
+
+    cube.createVBO();
+    cube.createVAO();
+
+    ancre.createVBO();
+    ancre.createVAO();
+
+    anemone1.createVBO();
+    anemone1.createVAO();
+
+    anemone2.createVBO();
+    anemone2.createVAO();
+
+    huitre.createVBO();
+    huitre.createVAO();
+
+    plongeur.createVBO();
+    plongeur.createVAO();
 
     ///////////// GESTION DES BOIDS ///////////////
     Field field(50, ctx);
@@ -184,6 +290,10 @@ int main()
         MVMatrix               = viewMatrix * MVMatrix;
         glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
 
+        ///////////// GESTION DES OBJETS ///////////////
+
+        ////////// DESSIN DES NEMO //////////
+
         glBindVertexArray(nemo.getVao());
 
         glActiveTexture(GL_TEXTURE0);
@@ -194,7 +304,7 @@ int main()
         {
             MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f}); // Translation
             MVMatrix = glm::translate(MVMatrix, positions[i]);          // Translation * Rotation * Translation
-            MVMatrix = glm::scale(MVMatrix, glm::vec3{1.f});
+            MVMatrix = glm::scale(MVMatrix, glm::vec3{10.f});
             MVMatrix = viewMatrix * MVMatrix;
             // glm::mat4 MVMatrixBoids = glm::translate(glm::mat4{1.f}, {1.f, 1.f, -1.f}); // Translation
             // MVMatrixBoids           = glm::translate(MVMatrixBoids, positions[i]);      // Translation * Rotation * Translation
@@ -206,8 +316,115 @@ int main()
             glDrawArrays(GL_TRIANGLES, 0, nemo.getVertices().size());
         };
 
-        // debinder le vbo
+        ////////// DESSIN DU CUBE //////////
+
+        glBindVertexArray(cube.getVao());
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texCube); // bind txt cube à la place
+
+        glUniform1i(program.uTexture, 0);
+        MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
+        MVMatrix = viewMatrix * MVMatrix;
+
+        glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+        glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+        glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+        glDrawArrays(GL_TRIANGLES, 0, cube.getVertices().size());
+
         glBindVertexArray(0);
+
+        ////////// DESSIN DES ANEMONES 1 //////////
+
+        glBindVertexArray(anemone1.getVao());
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texAnemone1); // bind txt cube à la place
+
+        glUniform1i(program.uTexture, 0);
+        MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
+        MVMatrix = viewMatrix * MVMatrix;
+
+        glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+        glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+        glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+        glDrawArrays(GL_TRIANGLES, 0, anemone1.getVertices().size());
+
+        glBindVertexArray(0);
+
+        ////////// DESSIN DES ANEMONES 2 //////////
+
+        glBindVertexArray(anemone2.getVao());
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texAnemone2); // bind txt cube à la place
+
+        glUniform1i(program.uTexture, 0);
+        MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
+        MVMatrix = viewMatrix * MVMatrix;
+
+        glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+        glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+        glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+        glDrawArrays(GL_TRIANGLES, 0, anemone2.getVertices().size());
+
+        glBindVertexArray(0);
+
+        ////////// DESSIN DES HUITRES //////////
+
+        glBindVertexArray(huitre.getVao());
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texHuitre); // bind txt cube à la place
+
+        glUniform1i(program.uTexture, 0);
+        MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
+        MVMatrix = viewMatrix * MVMatrix;
+
+        glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+        glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+        glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+        glDrawArrays(GL_TRIANGLES, 0, huitre.getVertices().size());
+
+        glBindVertexArray(0);
+
+        ////////// DESSIN DE L'ANCRE  //////////
+
+        glBindVertexArray(ancre.getVao());
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texAncre); // bind txt cube à la place
+
+        glUniform1i(program.uTexture, 0);
+        MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
+        MVMatrix = viewMatrix * MVMatrix;
+
+        glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+        glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+        glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+        glDrawArrays(GL_TRIANGLES, 0, ancre.getVertices().size());
+
+        glBindVertexArray(0);
+
+        ////////// DESSIN DU PLONGEUR //////////
+
+        glBindVertexArray(plongeur.getVao());
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texPlongeur); // bind txt cube à la place
+
+        glUniform1i(program.uTexture, 0);
+
+        MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
+        MVMatrix = viewMatrix * MVMatrix;
+
+        glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+        glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+        glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+        glDrawArrays(GL_TRIANGLES, 0, plongeur.getVertices().size());
+
+        glBindVertexArray(0);
+
+        ////////// DESSIN DE LA TORTUE //////////
 
         glBindVertexArray(tortue.getVao());
 
@@ -217,7 +434,7 @@ int main()
 
         MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
         MVMatrix = glm::translate(MVMatrix, mainCharacter.getPosition());
-        MVMatrix = glm::scale(MVMatrix, glm::vec3{2.f});
+        MVMatrix = glm::scale(MVMatrix, glm::vec3{1.f});
         MVMatrix = viewMatrix * MVMatrix;
 
         glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));

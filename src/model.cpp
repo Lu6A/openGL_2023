@@ -4,6 +4,7 @@
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "loadingProgram.hpp"
 #include "p6/p6.h"
 
 void Model::loadModel(const std::string& fileName)
