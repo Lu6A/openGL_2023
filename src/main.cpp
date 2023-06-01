@@ -26,6 +26,20 @@ int main()
     auto ctx = p6::Context{{800, 600, "Boids"}};
     ctx.maximize_window();
 
+    ctx.imgui = [&]() {
+        // Show a simple window
+        ImGui::Begin("Test");
+        ImGui::SliderFloat("distance Between Boids", &strengths.m_distance, 0.001, 10);
+        ImGui::SliderInt("separation Strength", &(strengths.m_separationStrength), 0, 2);
+        ImGui::SliderInt("cohesion Strength", &(strengths.m_cohesionStrength), 0, 10);
+        ImGui::SliderInt("alignment Strength", &(strengths.m_alignmentStrength), 0, 10);
+        ImGui::SliderFloat("maximum speed", &(strengths.m_vitesseMax), 0.001, 0.02);
+
+        ImGui::End();
+        // Show the official ImGui demo window
+        // It is very useful to discover all the widgets available in ImGui
+    };
+
     MainCharacter mainCharacter = MainCharacter();
 
     ///////////// GESTION DE LA CAMERA ///////////////
