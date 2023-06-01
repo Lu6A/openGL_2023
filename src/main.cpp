@@ -18,7 +18,7 @@
 #include "model.hpp"
 #include "p6/p6.h"
 
-strengths strengths = {1, 1, 1, 0.06f, glm::length(glm::vec3(0.003f, 0.003f, 0.003f))};
+strengths strengths = {1, 1, 1, 0.06f, glm::length(glm::vec3(0.01f, 0.01f, 0.01f))};
 
 int main()
 {
@@ -204,7 +204,7 @@ int main()
     plongeur.createVAO();
 
     ///////////// GESTION DES BOIDS ///////////////
-    Field field(50, ctx);
+    Field field(30, ctx);
 
     ctx.update = [&]() {
         std::vector<glm::vec3> positions = field.fieldDraw(ctx);
@@ -216,19 +216,19 @@ int main()
 
         if (rightMove)
         {
-            mainCharacter.rotateLeft(-0.5f);
+            mainCharacter.rotateLeft(0.5f);
         }
         if (leftMove)
         {
-            mainCharacter.rotateLeft(+0.5f);
+            mainCharacter.rotateLeft(-0.5f);
         }
         if (upMove)
         {
-            mainCharacter.moveFront(0.05f);
+            mainCharacter.moveFront(-0.05f);
         }
         if (downMove)
         {
-            mainCharacter.moveFront(-0.05f);
+            mainCharacter.moveFront(0.05f);
         }
 
         ctx.key_pressed = [&rightMove, &upMove, &leftMove, &downMove](p6::Key key) {
@@ -304,7 +304,7 @@ int main()
         {
             MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f}); // Translation
             MVMatrix = glm::translate(MVMatrix, positions[i]);          // Translation * Rotation * Translation
-            MVMatrix = glm::scale(MVMatrix, glm::vec3{10.f});
+            MVMatrix = glm::scale(MVMatrix, glm::vec3{3.f});
             MVMatrix = viewMatrix * MVMatrix;
             // glm::mat4 MVMatrixBoids = glm::translate(glm::mat4{1.f}, {1.f, 1.f, -1.f}); // Translation
             // MVMatrixBoids           = glm::translate(MVMatrixBoids, positions[i]);      // Translation * Rotation * Translation
@@ -432,9 +432,10 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texTortue); // bind txt tortue à la place
         glUniform1i(program.uTexture, 0);
 
-        MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
+        MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, -1.f, 0.f});
         MVMatrix = glm::translate(MVMatrix, mainCharacter.getPosition());
         MVMatrix = glm::scale(MVMatrix, glm::vec3{1.f});
+        MVMatrix = glm::rotate(MVMatrix, glm::radians(90.f), glm::vec3{0.f, 1.f, 0.f});
         MVMatrix = viewMatrix * MVMatrix;
 
         glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
@@ -443,8 +444,6 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, tortue.getVertices().size());
 
         glBindVertexArray(0);
-
-        camera.followCharacter(mainCharacter.getPosition());
     };
 
     ctx.start();

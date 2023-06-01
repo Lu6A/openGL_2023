@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glm/ext/scalar_constants.hpp"
+#include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 
 class FreeflyCamera {
@@ -22,11 +23,12 @@ public:
         computeDirectionVectors();
     };
 
-    void moveLeft(float t);
-    void moveFront(float t);
-    void rotateLeft(float degrees);
-    void rotateUp(float degrees);
-    void followCharacter(const glm::vec3 character_position);
+    void      moveLeft(float t);
+    void      moveFront(float t);
+    void      rotateLeft(float degrees);
+    void      rotateUp(float degrees);
+    void      followCharacter(const glm::vec3 character_position);
+    glm::vec3 getPosition() const;
 
     void setDistance(float t) {}
 
