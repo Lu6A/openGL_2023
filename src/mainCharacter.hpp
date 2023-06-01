@@ -1,4 +1,3 @@
-
 #pragma once
 #include <glm/glm.hpp>
 #include "glimac/freeflyCamera.hpp"
