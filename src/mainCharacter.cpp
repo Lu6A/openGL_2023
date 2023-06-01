@@ -27,13 +27,13 @@ MainCharacter::MainCharacter()
     : m_position(glm::vec3(0., 0., 0.)), m_Phi(p6::PI), m_Theta(0.), m_RotationAngle(0.)
 {
     this->computeDirectionVectors();
-};
+}
 
 MainCharacter::MainCharacter(glm::vec3 position, float phi, float theta)
     : m_position(position), m_Phi(phi), m_Theta(theta)
 {
     this->computeDirectionVectors();
-};
+}
 
 void MainCharacter::computeDirectionVectors()
 {

@@ -212,6 +212,20 @@ int main()
 
         program._program.use();
 
+        ctx.imgui = [&]() {
+            // Show a simple window
+            ImGui::Begin("Test");
+            ImGui::SliderFloat("distance Between Boids", &strengths.m_distance, 0.001, 10);
+            ImGui::SliderInt("separation Strength", &(strengths.m_separationStrength), 0, 2);
+            ImGui::SliderInt("cohesion Strength", &(strengths.m_cohesionStrength), 0, 10);
+            ImGui::SliderInt("alignment Strength", &(strengths.m_alignmentStrength), 0, 10);
+            ImGui::SliderFloat("maximum speed", &(strengths.m_vitesseMax), 0.001, 0.02);
+
+            ImGui::End();
+            // Show the official ImGui demo window
+            // It is very useful to discover all the widgets available in ImGui
+        };
+
         ///////////// GESTION DE LA CAMERA ///////////////
 
         if (rightMove)
@@ -280,10 +294,28 @@ int main()
 
         glm::mat4 viewMatrix = mainCharacter.getViewMatrix();
 
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // LIGHT
+
+        program._program.use();
+
+        glm::vec3 lightPosition     = glm::vec3(0.f, 20.f, 0.f);
+        glm::vec3 lightViewPosition = glm::vec3(viewMatrix * glm::vec4(lightPosition, 1.f));
+        glUniform3fv(program.uLightPosition2, 1, glm::value_ptr(lightViewPosition));
+
+        glm::vec3 intensity = glm::vec3(100.f, 300.f, 500.f);
+        glUniform3fv(program.uLightIntensity2, 1, glm::value_ptr(intensity));
+
+        glm::vec3 lightDir     = glm::vec3(1.f, -1.f, 1.f);
+        glm::vec3 lightViewDir = glm::vec3(viewMatrix * glm::vec4(lightDir, 1.f));
+        glUniform3fv(program.uLightDir, 1, glm::value_ptr(lightViewDir));
+
+        intensity = glm::vec3(1.f, 1.f, 1.f);
+        glUniform3fv(program.uLightIntensity3, 1, glm::value_ptr(intensity));
+
         ///////////// GESTION DE LA CAMERA ///////////////
         // glm::mat4 viewMatrix = camera.getViewMatrix();
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
         glm::mat4 MVMatrix     = glm::translate(glm::mat4(1.0), glm::vec3(0., -5., -5.));
@@ -330,6 +362,11 @@ int main()
         glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
         glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
         glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+
+        glUniform3fv(program.uKd, 1, glm::value_ptr(glm::vec3(1.5f, 0.5f, 0.3f)));
+        glUniform3fv(program.uKs, 1, glm::value_ptr(glm::vec3(1.5f, 0.9f, 0.6f)));
+        glUniform1f(program.uShininess, 0.9f);
+
         glDrawArrays(GL_TRIANGLES, 0, cube.getVertices().size());
 
         glBindVertexArray(0);
@@ -441,9 +478,20 @@ int main()
         glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
         glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
         glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+
         glDrawArrays(GL_TRIANGLES, 0, tortue.getVertices().size());
 
+        lightPosition     = mainCharacter.getPosition() + glm::vec3(0.f, 5.f, 0.f);
+        lightViewPosition = glm::vec3(viewMatrix * glm::vec4(lightPosition, 1.f));
+        glUniform3fv(program.uLightPosition, 1, glm::value_ptr(lightViewPosition));
+
+        intensity = glm::vec3(10.f, 0.f, 20.f);
+        glUniform3fv(program.uLightIntensity, 1, glm::value_ptr(intensity));
+
         glBindVertexArray(0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        camera.followCharacter(mainCharacter.getPosition());
     };
 
     ctx.start();
