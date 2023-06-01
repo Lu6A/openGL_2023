@@ -33,14 +33,15 @@ int main()
     FreeflyCamera camera;
     glm::mat4     viewCamera = camera.getViewMatrix();
 
-    bool right_rot  = false;
-    bool left_rot   = false;
-    bool up_rot     = false;
-    bool down_rot   = false;
-    bool right_move = false;
-    bool left_move  = false;
-    bool front_move = false;
-    bool back_move  = false;
+    // bool leftRot  = false;
+    // bool rightRot = false;
+    // bool upRot    = false;
+    // bool downRot  = false;
+
+    bool leftMove  = false;
+    bool rightMove = false;
+    bool upMove    = false;
+    bool downMove  = false;
 
     // ctx.mouse_scrolled = [&](p6::MouseScroll scroll) {
     //     camera.zoom(-scroll.dy);
@@ -107,107 +108,80 @@ int main()
 
         ///////////// GESTION DE LA CAMERA ///////////////
 
-        if (right_rot)
+        if (rightMove)
         {
-            camera.rotateLeft(-1.f);
+            mainCharacter.rotateLeft(-0.5f);
         }
-        if (left_rot)
+        if (leftMove)
         {
-            camera.rotateLeft(1.f);
+            mainCharacter.rotateLeft(+0.5f);
         }
-        if (up_rot)
+        if (upMove)
         {
-            camera.rotateUp(1.f);
+            mainCharacter.moveFront(0.05f);
         }
-        if (down_rot)
+        if (downMove)
         {
-            camera.rotateUp(-1.f);
-        }
-        if (left_move)
-        {
-            // camera.moveLeft(0.5f);
-            mainCharacter.moveLeft();
-        }
-        if (right_move)
-        {
-            // camera.moveLeft(-0.5f);
-            mainCharacter.moveRight();
-        }
-        if (front_move)
-        {
-            // camera.moveFront(-0.5f);
-            mainCharacter.moveForward();
-        }
-        if (back_move)
-        {
-            // camera.moveFront(0.5f);
-            mainCharacter.moveBackward();
+            mainCharacter.moveFront(-0.05f);
         }
 
-        ///////////// GESTION DES MOUVEMENTS DU PERSONNAGE ///////////////
-
-        ctx.key_pressed = [&left_move, &right_move, &front_move, &back_move](p6::Key key) {
-            if (key.physical == GLFW_KEY_LEFT)
+        ctx.key_pressed = [&rightMove, &upMove, &leftMove, &downMove](p6::Key key) {
+            if (key.logical == "d")
             {
-                left_move = true;
+                rightMove = true;
             }
-            if (key.physical == GLFW_KEY_RIGHT)
+            if (key.logical == "q")
             {
-                right_move = true;
+                leftMove = true;
             }
-            if (key.physical == GLFW_KEY_UP)
+            if (key.logical == "z")
             {
-                front_move = true;
+                upMove = true;
             }
-            if (key.physical == GLFW_KEY_DOWN)
+            if (key.logical == "s")
             {
-                back_move = true;
+                downMove = true;
             }
         };
 
-        ctx.key_released = [&left_move, &right_move, &front_move, &back_move, &mainCharacter](p6::Key key) {
-            if (key.physical == GLFW_KEY_LEFT)
+        ctx.key_released = [&rightMove, &upMove, &leftMove, &downMove](p6::Key key) {
+            if (key.logical == "d")
             {
-                left_move = false;
-                mainCharacter.stopMovement();
+                rightMove = false;
             }
-            if (key.physical == GLFW_KEY_RIGHT)
+            if (key.logical == "q")
             {
-                right_move = false;
-                mainCharacter.stopMovement();
+                leftMove = false;
             }
-            if (key.physical == GLFW_KEY_UP)
+            if (key.logical == "z")
             {
-                front_move = false;
-                mainCharacter.stopMovement();
+                upMove = false;
             }
-            if (key.physical == GLFW_KEY_DOWN)
+            if (key.logical == "s")
             {
-                back_move = false;
-                mainCharacter.stopMovement();
+                downMove = false;
             }
         };
 
-        ctx.mouse_dragged = [&camera](const p6::MouseDrag& button) {
-            camera.rotateLeft(button.delta.x * 5);
-            camera.rotateUp(-button.delta.y * 5);
+        ctx.mouse_dragged = [&mainCharacter](const p6::MouseDrag& button) {
+            mainCharacter.rotateLeft(button.delta.x * 5);
+            mainCharacter.rotateUp(-button.delta.y * 5);
         };
 
         ctx.mouse_scrolled = [&](p6::MouseScroll scroll) {
-            camera.moveFront(-scroll.dy);
+            mainCharacter.moveFront(-scroll.dy);
         };
 
-        glm::mat4 viewMatrix = camera.getViewMatrix();
-
-        mainCharacter.update();
+        glm::mat4 viewMatrix = mainCharacter.getViewMatrix();
 
         ///////////// GESTION DE LA CAMERA ///////////////
         // glm::mat4 viewMatrix = camera.getViewMatrix();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), 800.f / 600.f, 0.1f, 100.f);
-        glm::mat4 MVMatrix     = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
+        glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
+        glm::mat4 MVMatrix     = glm::translate(glm::mat4(1.0), glm::vec3(0., -5., -5.));
+        MVMatrix               = viewMatrix * MVMatrix;
         glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
 
         glBindVertexArray(nemo.getVao());

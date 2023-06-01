@@ -33,7 +33,6 @@ void FreeflyCamera::rotateUp(float degrees)
     m_teta += glm::radians(degrees);
     computeDirectionVectors();
 }
-
 void FreeflyCamera::followCharacter(const glm::vec3 character_position)
 {
     m_position = character_position - m_distance * m_FrontVector;

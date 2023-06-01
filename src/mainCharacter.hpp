@@ -7,19 +7,32 @@ class MainCharacter {
 private:
     glm::vec3 m_position;
     glm::vec3 m_velocity;
-    // FreeflyCamera camera;
+    float     m_Phi;   // coord spherique de F
+    float     m_Theta; // coord spherique de F
+    float     m_RotationAngle;
+
+    glm::vec3 m_FrontVector; // vecteur F
+    glm::vec3 m_LeftVector;  // vecteur L
+    glm::vec3 m_UpVector;    // vecteur U
+
+    void computeDirectionVectors();
 
 public:
-    MainCharacter()
-        : m_position(0.f, 0.f, 0.f), m_velocity(0.f, 0.f, 0.f){};
+    MainCharacter();
+    MainCharacter(glm::vec3 position, float phi, float theta);
+    ~MainCharacter() = default;
 
-    void      update();
-    void      moveUp();
-    void      moveDown();
-    void      moveLeft();
-    void      moveRight();
-    void      moveForward();
-    void      moveBackward();
-    void      stopMovement();
+    void setPosition(glm::vec3 posMainCharacter);
+
     glm::vec3 getPosition();
+    void      setRotationAngle(float rotationAngle);
+    float     getRotationAngle() const;
+
+    void moveLeft(float t);
+    void moveFront(float t);
+
+    void rotateLeft(float degrees);
+    void rotateUp(float degrees);
+
+    glm::mat4 getViewMatrix() const;
 };
