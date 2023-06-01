@@ -23,9 +23,9 @@ Boid::Boid(const p6::Context& ctx) // aléatoire
         -2.f
     ))
     , m_velocity(glm::vec3(
-          p6::random::number(-0.2f, 0.2f),
-          p6::random::number(-0.2f, 0.2f),
-          p6::random::number(-0.2f, 0.2f)
+          p6::random::number(-100.f, 100.f),
+          p6::random::number(-100.f, 100.f),
+          p6::random::number(-100.f, 100.f)
       ))
 {
 }
@@ -57,34 +57,34 @@ glm::vec3 Boid::render(p6::Context& ctx)
     //     m_velocity.z *= -1;
     // }
 
-    if (m_position.x > 0.5)
+    if (m_position.x > 100)
     {
         m_position.x = 0.5;
         m_velocity.x *= -1;
     }
-    else if (m_position.x < -0.5)
+    else if (m_position.x < -100)
     {
         m_position.x = -0.5;
         m_velocity.x *= -1;
     }
 
-    if (m_position.y > 0.5)
+    if (m_position.y > 100)
     {
         m_position.y = 0.5;
         m_velocity.y *= -1;
     }
-    else if (m_position.y < -0.5)
+    else if (m_position.y < -10)
     {
         m_position.y = -0.5;
         m_velocity.y *= -1;
     }
 
-    if (m_position.z > 0.5)
+    if (m_position.z > 100)
     {
         m_position.z = 0.5;
         m_velocity.z *= -1;
     }
-    else if (m_position.z < -0.5)
+    else if (m_position.z < -100)
     {
         m_position.z = -0.5;
         m_velocity.z *= -1;

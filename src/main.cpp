@@ -111,7 +111,7 @@ int main()
     tortue.loadModel("turtle.obj");
 
     Model environnement = Model();
-    environnement.loadModel("environnement - sans ancre.obj");
+    environnement.loadModel("environnement2.obj");
 
     Model anchor = Model();
     anchor.loadModel("anchor.obj");
@@ -256,7 +256,7 @@ int main()
         {
             MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f}); // Translation
             MVMatrix = glm::translate(MVMatrix, positions[i]);          // Translation * Rotation * Translation
-            MVMatrix = glm::scale(MVMatrix, glm::vec3{1.f});
+            MVMatrix = glm::scale(MVMatrix, glm::vec3{20.f});
             MVMatrix = viewMatrix * MVMatrix;
             // glm::mat4 MVMatrixBoids = glm::translate(glm::mat4{1.f}, {1.f, 1.f, -1.f}); // Translation
             // MVMatrixBoids           = glm::translate(MVMatrixBoids, positions[i]);      // Translation * Rotation * Translation
