@@ -16,7 +16,7 @@
 #include "mainCharacter/mainCharacter.hpp"
 #include "p6/p6.h"
 
-strengths strengths = {1, 1, 1, 0.06f, glm::length(glm::vec3(0.01f, 0.01f, 0.01f))};
+strengths strengths = {1, 1, 1, 0.06f, glm::length(glm::vec3(0.02f, 0.02f, 0.02f))};
 
 int main()
 {
@@ -213,11 +213,11 @@ int main()
         ctx.imgui = [&]() {
             // Show a simple window
             ImGui::Begin("Test");
-            ImGui::SliderFloat("distance Between Boids", &strengths.m_distance, 0.001, 10);
-            ImGui::SliderInt("separation Strength", &(strengths.m_separationStrength), 0, 2);
+            ImGui::SliderFloat("distance Between Boids", &strengths.m_distance, 0.001, 5);
+            ImGui::SliderInt("separation Strength", &(strengths.m_separationStrength), 0, 10);
             ImGui::SliderInt("cohesion Strength", &(strengths.m_cohesionStrength), 0, 10);
             ImGui::SliderInt("alignment Strength", &(strengths.m_alignmentStrength), 0, 10);
-            ImGui::SliderFloat("maximum speed", &(strengths.m_vitesseMax), 0.001, 0.02);
+            ImGui::SliderFloat("Speed", &(strengths.m_vitesseMax), 0.001, 0.05);
 
             ImGui::End();
             // Show the official ImGui demo window

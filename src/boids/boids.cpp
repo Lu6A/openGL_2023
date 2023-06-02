@@ -125,7 +125,7 @@ glm::vec3 Boid::separationRule(std::vector<Boid> boids, strengths strengths)
     {
         if (boid.distanceBetween(*this) < strengths.m_distance) // équivaut à  'if (boids[i].distanceBetween(*this) < dist)'
         {
-            separationVec += (this->m_position - boid.getPosition()) / 1000.f;
+            separationVec += (this->m_position - boid.getPosition()) / 500.f;
             count++;
         }
     }
