@@ -1,46 +1,9 @@
-// #version 330 core
-
-// in vec2 vTextCoord;
-// in vec3 vVertexNormalVS;
-// out vec4 fFragColor;
-
-// uniform sampler2D uTexture;
-// uniform vec3 uLightDirection;
-// uniform vec3 uSpecularLightColor;
-// uniform float uSpecularLightIntensity;
-// uniform float uSpecularShininess;
-// uniform vec3 uCameraPosition;
-
-// void main()
-// {
-//     vec2 fCorrectCoords = vec2(vTextCoord.x, 1 - vTextCoord.y);
-//     vec4 color = texture(uTexture, fCorrectCoords);
-
-//     vec3 normal = normalize(vVertexNormalVS);
-//     vec3 lightDirection = normalize(uLightDirection);
-//     vec3 viewDirection = normalize(uCameraPosition - gl_FragCoord.xyz);
-
-//     vec3 reflectionDirection = reflect(-lightDirection, normal);
-//     float specularFactor = pow(max(dot(reflectionDirection, viewDirection), 0.0), uSpecularShininess);
-//     vec3 specularColor = uSpecularLightColor * uSpecularLightIntensity;
-//     vec3 finalColor = color.rgb + specularColor * specularFactor;
-
-//     fFragColor = vec4(finalColor, color.a);
-// }
-
-
-
 #version 330 core
-
 
 //sorties   VS=view space
 in vec3 vVertexPositionVS;
 in vec3 vVertexNormalVS;
 in vec2 vTextCoord;
-
-// uniform int uNumLights;  // Nombre de lumières
-// uniform vec3 uLightPos[MAX_LIGHTS];  // Tableau de positions des lumières
-// uniform vec3 uLightIntensity[MAX_LIGHTS];  // Tableau d'intensités des lumières
 
 uniform vec3 uLightPos1;
 uniform vec3 uLightPos2;
@@ -95,6 +58,4 @@ void main() {
     
 
     fFragColor = vec4( color_texture * lights , 1.0) ;
-
-    
 }

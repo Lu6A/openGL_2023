@@ -27,7 +27,6 @@ public:
     void      moveFront(float t);
     void      rotateLeft(float degrees);
     void      rotateUp(float degrees);
-    void      followCharacter(const glm::vec3 character_position);
     glm::vec3 getPosition() const;
 
     void setDistance(float t) {}

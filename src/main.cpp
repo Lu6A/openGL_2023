@@ -3,9 +3,9 @@
 #include "boids/boids.hpp"
 #include "boids/field.hpp"
 #include "boids/strengths.hpp"
-#include "glimac/common.hpp"
-#include "glimac/freeflyCamera.hpp"
-#include "glimac/sphere_vertices.hpp"
+#include "camera/freeflyCamera.hpp"
+#include "environnement/loadingProgram.hpp"
+#include "environnement/model.hpp"
 #include "glm/ext/quaternion_trigonometric.hpp"
 #include "glm/ext/scalar_constants.hpp"
 #include "glm/fwd.hpp"
@@ -13,9 +13,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/trigonometric.hpp"
 #include "img/src/Image.h"
-#include "loadingProgram.hpp"
-#include "mainCharacter.hpp"
-#include "model.hpp"
+#include "mainCharacter/mainCharacter.hpp"
 #include "p6/p6.h"
 
 strengths strengths = {1, 1, 1, 0.06f, glm::length(glm::vec3(0.01f, 0.01f, 0.01f))};
@@ -490,8 +488,6 @@ int main()
 
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
-
-        camera.followCharacter(mainCharacter.getPosition());
     };
 
     ctx.start();
