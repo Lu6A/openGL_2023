@@ -1,5 +1,3 @@
-#include <iostream>
-#include <vector>
 #include "boids/boids.hpp"
 #include "boids/field.hpp"
 #include "boids/strengths.hpp"
@@ -14,7 +12,6 @@
 #include "glm/trigonometric.hpp"
 #include "img/src/Image.h"
 #include "mainCharacter/mainCharacter.hpp"
-#include "p6/p6.h"
 
 strengths strengths = {1, 1, 1, 0.06f, glm::length(glm::vec3(0.02f, 0.02f, 0.02f))};
 
@@ -31,19 +28,10 @@ int main()
     FreeflyCamera camera;
     glm::mat4     viewCamera = camera.getViewMatrix();
 
-    // bool leftRot  = false;
-    // bool rightRot = false;
-    // bool upRot    = false;
-    // bool downRot  = false;
-
     bool leftMove  = false;
     bool rightMove = false;
     bool upMove    = false;
     bool downMove  = false;
-
-    // ctx.mouse_scrolled = [&](p6::MouseScroll scroll) {
-    //     camera.zoom(-scroll.dy);
-    // };
 
     /////////////// GESTION DES SHADERS ///////////////
 
@@ -142,8 +130,6 @@ int main()
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    // glBindTexture(GL_TEXTURE_2D, 0);
-
     ///////////// GESTION DES OBJETS ///////////////
 
     // chargement des modèles////
@@ -220,8 +206,6 @@ int main()
             ImGui::SliderFloat("Speed", &(strengths.m_vitesseMax), 0.001, 0.05);
 
             ImGui::End();
-            // Show the official ImGui demo window
-            // It is very useful to discover all the widgets available in ImGui
         };
 
         ///////////// GESTION DE LA CAMERA ///////////////
@@ -294,7 +278,7 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // LIGHT
+        // LUMIERE
 
         program._program.use();
 
@@ -313,7 +297,6 @@ int main()
         glUniform3fv(program.uLightIntensity3, 1, glm::value_ptr(intensity));
 
         ///////////// GESTION DE LA CAMERA ///////////////
-        // glm::mat4 viewMatrix = camera.getViewMatrix();
 
         glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
         glm::mat4 MVMatrix     = glm::translate(glm::mat4(1.0), glm::vec3(0., -5., -5.));
@@ -327,7 +310,7 @@ int main()
         glBindVertexArray(nemo.getVao());
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texNemo); // bind txt moon à la place
+        glBindTexture(GL_TEXTURE_2D, texNemo); // bind txt nemo à la place
         glUniform1i(program.uTexture, 0);
 
         for (size_t i = 0; i < field.getBoids().size(); i++)
@@ -336,10 +319,7 @@ int main()
             MVMatrix = glm::translate(MVMatrix, positions[i]);          // Translation * Rotation * Translation
             MVMatrix = glm::scale(MVMatrix, glm::vec3{3.f});
             MVMatrix = viewMatrix * MVMatrix;
-            // glm::mat4 MVMatrixBoids = glm::translate(glm::mat4{1.f}, {1.f, 1.f, -1.f}); // Translation
-            // MVMatrixBoids           = glm::translate(MVMatrixBoids, positions[i]);      // Translation * Rotation * Translation
-            // MVMatrixBoids           = glm::scale(MVMatrixBoids, glm::vec3{1., 1., 1.}); // Translation * Rotation * Translation * Scale
-            // MVMatrixBoids           = MVMatrix * MVMatrixBoids;
+
             glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
             glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
             glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
@@ -374,7 +354,7 @@ int main()
         glBindVertexArray(anemone1.getVao());
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texAnemone1); // bind txt cube à la place
+        glBindTexture(GL_TEXTURE_2D, texAnemone1); // bind txt anemone1 à la place
 
         glUniform1i(program.uTexture, 0);
         MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
@@ -391,7 +371,7 @@ int main()
 
         glBindVertexArray(anemone2.getVao());
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texAnemone2); // bind txt cube à la place
+        glBindTexture(GL_TEXTURE_2D, texAnemone2); // bind txt anemone2 à la place
 
         glUniform1i(program.uTexture, 0);
         MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
@@ -409,7 +389,7 @@ int main()
         glBindVertexArray(huitre.getVao());
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texHuitre); // bind txt cube à la place
+        glBindTexture(GL_TEXTURE_2D, texHuitre); // bind txt huitre à la place
 
         glUniform1i(program.uTexture, 0);
         MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
@@ -427,7 +407,7 @@ int main()
         glBindVertexArray(ancre.getVao());
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texAncre); // bind txt cube à la place
+        glBindTexture(GL_TEXTURE_2D, texAncre); // bind txt ancre à la place
 
         glUniform1i(program.uTexture, 0);
         MVMatrix = glm::translate(glm::mat4{1.f}, {0.f, 0.f, 0.f});
@@ -445,7 +425,7 @@ int main()
         glBindVertexArray(plongeur.getVao());
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texPlongeur); // bind txt cube à la place
+        glBindTexture(GL_TEXTURE_2D, texPlongeur); // bind txt plongeur à la place
 
         glUniform1i(program.uTexture, 0);
 
@@ -496,4 +476,10 @@ int main()
     glBindTexture(GL_TEXTURE_2D, 0);
     glDeleteTextures(1, &texNemo);
     glDeleteTextures(1, &texTortue);
+    glDeleteTextures(1, &texAnemone1);
+    glDeleteTextures(1, &texAnemone2);
+    glDeleteTextures(1, &texAncre);
+    glDeleteTextures(1, &texCube);
+    glDeleteTextures(1, &texHuitre);
+    glDeleteTextures(1, &texPlongeur);
 }

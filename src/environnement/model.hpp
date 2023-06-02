@@ -12,7 +12,6 @@ protected:
     GLuint                           m_vao;
     std::vector<glimac::ShapeVertex> m_vertices;
     std::vector<int>                 m_index;
-    GLsizei                          m_vertexCount;
     float                            m_Rotation;
 
 public:
@@ -26,7 +25,6 @@ public:
 
     void                             loadModel(const std::string& fileName);
     std::vector<glimac::ShapeVertex> getVertices() const { return m_vertices; }
-    GLsizei                          getNumVertices() const { return m_vertexCount; }
     void                             createVBO();
     void                             createVAO();
 

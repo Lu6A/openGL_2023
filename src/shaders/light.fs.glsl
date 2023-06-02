@@ -1,6 +1,5 @@
 #version 330 core
 
-//sorties   VS=view space
 in vec3 vVertexPositionVS;
 in vec3 vVertexNormalVS;
 in vec2 vTextCoord;

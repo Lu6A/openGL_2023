@@ -30,10 +30,6 @@ void Model::loadModel(const std::string& fileName)
         exit(1);
     }
 
-    // Le chargement a réussi
-    // Vous pouvez accéder aux données du modèle à partir de la variable 'shapes' et 'materials'
-    std::cout << "c'est chargé tkt" << std::endl;
-
     // Process the model data and prepare it for rendering
     for (const auto& shape : shapes)
     {
@@ -58,14 +54,6 @@ void Model::loadModel(const std::string& fileName)
             m_vertices.push_back(vertex);
         }
     }
-
-    m_vertexCount = static_cast<GLsizei>(m_vertices.size());
-
-    // Print some information about the loaded model
-    std::cout << "Loaded model: " << fileName << std::endl;
-    std::cout << "Number of vertices: " << m_vertexCount << std::endl;
-    std::cout << "Number of shapes: " << shapes.size() << std::endl;
-    std::cout << "Number of materials: " << materials.size() << std::endl;
 }
 
 void Model::createVBO()
