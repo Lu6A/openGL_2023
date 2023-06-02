@@ -1,7 +1,5 @@
+#pragma once
 #include "freeflyCamera.hpp"
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/fwd.hpp"
-#include "glm/gtc/quaternion.hpp"
 
 void FreeflyCamera::computeDirectionVectors()
 {

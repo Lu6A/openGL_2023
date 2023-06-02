@@ -1,16 +1,7 @@
-#include "boids/boids.hpp"
 #include "boids/field.hpp"
-#include "boids/strengths.hpp"
 #include "camera/freeflyCamera.hpp"
 #include "environnement/loadingProgram.hpp"
 #include "environnement/model.hpp"
-#include "glm/ext/quaternion_trigonometric.hpp"
-#include "glm/ext/scalar_constants.hpp"
-#include "glm/fwd.hpp"
-#include "glm/glm.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "glm/trigonometric.hpp"
-#include "img/src/Image.h"
 #include "mainCharacter/mainCharacter.hpp"
 
 strengths strengths = {1, 1, 1, 0.06f, glm::length(glm::vec3(0.02f, 0.02f, 0.02f))};
