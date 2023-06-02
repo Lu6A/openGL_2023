@@ -39,8 +39,6 @@ int main()
     img::Image plongeurMap = p6::load_image_buffer("assets/textures/plongeur.jpg");
     img::Image huitreMap   = p6::load_image_buffer("assets/textures/huitre.jpg");
 
-    program._program.use();
-
     GLuint texNemo = 0;
     glGenTextures(1, &texNemo);
 
@@ -138,15 +136,12 @@ int main()
 
     Model anemone1 = Model();
     anemone1.loadModel("anemone1.obj");
-    glEnable(GL_DEPTH_TEST);
 
     Model anemone2 = Model();
     anemone2.loadModel("anemone2.obj");
-    glEnable(GL_DEPTH_TEST);
 
     Model plongeur = Model();
     plongeur.loadModel("plongeur.obj");
-    glEnable(GL_DEPTH_TEST);
 
     Model huitre = Model();
     huitre.loadModel("huitre.obj");
